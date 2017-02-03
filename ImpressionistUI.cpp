@@ -308,7 +308,7 @@ void ImpressionistUI::cb_faster(Fl_Menu_* o, void* v)
 // Called by the UI when the safer menu item is chosen
 //------------------------------------------------------------
 void ImpressionistUI::cb_safer(Fl_Menu_* o, void* v) 
-{
+{	
 	fl_message("Safer todo");
 }
 
