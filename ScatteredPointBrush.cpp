@@ -8,7 +8,8 @@
 #include "impressionistDoc.h"
 #include "impressionistUI.h"
 #include "ScatteredPointBrush.h"
-
+#include <stdlib.h> 
+#include <time.h>
 extern float frand();
 
 ScatteredPointBrush::ScatteredPointBrush( ImpressionistDoc* pDoc, char* name ) :
@@ -21,11 +22,11 @@ void ScatteredPointBrush::BrushBegin( const Point source, const Point target )
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
 
-	int size = pDoc->getSize();
+	//int size = pDoc->getSize();
 
 
 
-	glPointSize( (float)size );
+	glPointSize( 1 );
 
 	BrushMove( source, target );
 }
@@ -34,17 +35,28 @@ void ScatteredPointBrush::BrushMove( const Point source, const Point target )
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
-
+	int size = pDoc->getSize();
 	if ( pDoc == NULL ) {
 		printf( "ScatteredPointBrush::BrushMove  document is NULL\n" );
 		return;
 	}
-
 	glBegin( GL_POINTS );
-		SetColor( source );
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < size; ++j)
+		{
+			// srand((unsigned int)(time(NULL)));
+			int index=rand()%3;
+			if (index == 1)
+			{
+				SetColor( Point(source.x - size/2 + i, source.y - size/2+j));
 
-		glVertex2d( target.x, target.y );
-
+				glVertex2d( target.x - size/2 + i, target.y - size/2 +j);
+			}
+			
+		}
+	}
+	
 	glEnd();
 }
 

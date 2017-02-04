@@ -8,7 +8,7 @@
 #include "impressionistDoc.h"
 #include "impressionistUI.h"
 #include "ScatteredLineBrush.h"
-
+#include <math.h>
 extern float frand();
 
 ScatteredLineBrush::ScatteredLineBrush( ImpressionistDoc* pDoc, char* name ) :
@@ -21,11 +21,12 @@ void ScatteredLineBrush::BrushBegin( const Point source, const Point target )
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
 
-	int size = pDoc->getSize();
+	int width = pDoc->getLineWidth();
 
 
 
-	glPointSize( (float)size );
+	glLineWidth((float)width);
+
 
 	BrushMove( source, target );
 }
@@ -34,16 +35,30 @@ void ScatteredLineBrush::BrushMove( const Point source, const Point target )
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
-
+	int size = pDoc->getSize();
+	int angle = pDoc->getLineAngle();
 	if ( pDoc == NULL ) {
-		printf( "ScatteredLineBrush::BrushMove  document is NULL\n" );
+		printf( "LineBrush::BrushMove  document is NULL\n" );
 		return;
 	}
+	glEnable(GL_LINE_SMOOTH);
+	glBegin( GL_LINES );
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < size; ++j)
+		{
+			// srand((unsigned int)(time(NULL)));
+			int index=rand()%3;
+			if (index == 1)
+			{
+				SetColor( Point(source.x - size/2 + i, source.y - size/2+j));
 
-	glBegin( GL_POINTS );
-		SetColor( source );
-
-		glVertex2d( target.x, target.y );
+				glVertex2d( target.x - size/2 + i + cos(angle) * size/2.0, target.y - size/2 + j - sin(angle) * size/2.0);
+				glVertex2d( target.x - size/2 + i - cos(angle) * size/2.0, target.y - size/2 + j + sin(angle) * size/2.0);
+			}
+			
+		}
+	}
 
 	glEnd();
 }

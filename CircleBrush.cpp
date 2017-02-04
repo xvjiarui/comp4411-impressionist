@@ -47,9 +47,9 @@ void CircleBrush::BrushMove( const Point source, const Point target )
 
 		glVertex2d( target.x, target.y );
 		
-		for (int i = 0; i <= 20; i++)   
+		for (int i = 0; i <= 50; i++)   
 		{
-        	glVertex2d ((target.x + (radius * cos(i * twicePi / 20))), (target.y + (radius * sin(i * twicePi / 20))));
+        	glVertex2d ((target.x + (radius * cos(i * twicePi / 50))), (target.y + (radius * sin(i * twicePi / 50))));
     	}
 
 	glEnd();
