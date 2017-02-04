@@ -356,7 +356,6 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 void ImpressionistUI::cb_sizeSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nSize=int( ((Fl_Slider *)o)->value() ) ;
-	printf("%d\n", ((ImpressionistUI*)(o->user_data()))->m_nSize);
 }
 
 //-----------------------------------------------------------
@@ -367,7 +366,6 @@ void ImpressionistUI::cb_sizeSlides(Fl_Widget* o, void* v)
 void ImpressionistUI::cb_lineWidthSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nLineWidth=int( ((Fl_Slider *)o)->value() ) ;
-	printf("%d\n", ((ImpressionistUI*)(o->user_data()))->m_nLineWidth);
 }
 
 //-----------------------------------------------------------
@@ -378,7 +376,6 @@ void ImpressionistUI::cb_lineWidthSlides(Fl_Widget* o, void* v)
 void ImpressionistUI::cb_lineAngleSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nLineAngle=int( ((Fl_Slider *)o)->value() ) ;
-	printf("%d\n", ((ImpressionistUI*)(o->user_data()))->m_nLineAngle);
 }
 
 //---------------------------------- per instance functions --------------------------------------

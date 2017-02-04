@@ -4,7 +4,7 @@
 // The implementation of Point Brush. It is a kind of ImpBrush. All your brush implementations
 // will look like the file with the different GL primitive calls.
 //
-
+#include <math.h>
 #include "impressionistDoc.h"
 #include "impressionistUI.h"
 #include "LineBrush.h"
@@ -21,11 +21,11 @@ void LineBrush::BrushBegin( const Point source, const Point target )
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
 
-	int size = pDoc->getSize();
+	int width = pDoc->getLineWidth();
 
 
 
-	glPointSize( (float)size );
+	glLineWidth((float)width);
 
 	BrushMove( source, target );
 }
@@ -34,16 +34,17 @@ void LineBrush::BrushMove( const Point source, const Point target )
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
-
+	double size = pDoc->getSize()/2;
+	int angle = pDoc->getLineAngle();
 	if ( pDoc == NULL ) {
 		printf( "LineBrush::BrushMove  document is NULL\n" );
 		return;
 	}
-
-	glBegin( GL_POINTS );
+	glEnable(GL_LINE_SMOOTH);
+	glBegin( GL_LINES );
 		SetColor( source );
-
-		glVertex2d( target.x, target.y );
+		glVertex2d( target.x + cos(angle) * size, target.y - sin(angle) * size);
+		glVertex2d( target.x - cos(angle) * size, target.y + sin(angle) * size);
 
 	glEnd();
 }
