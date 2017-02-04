@@ -40,6 +40,7 @@ public:
 	Fl_Slider*			m_BrushSizeSlider;
 	Fl_Slider*			m_BrushLineWidthSlider;
 	Fl_Slider*			m_BrushLineAngleSlider;
+	Fl_Slider* 			m_OpacitySlider;
 	Fl_Button*          m_ClearCanvasButton;
 
 	// Member functions
@@ -54,9 +55,11 @@ public:
 	int					getSize();
 	int 				getLineWidth();
 	int 				getLineAngle();
+	double				getOpacity();
 	void				setSize(int size);
 	void 				setLineWidth(int width);
 	void 				setLineAngle(int angle);
+	void 				setOpacity(double opacity);
 
 private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
@@ -65,6 +68,7 @@ private:
 	int		m_nSize;
 	int 	m_nLineWidth;
 	int 	m_nLineAngle;
+	double 	m_nOpacity;
 
 	// Static class members
 	static Fl_Menu_Item		menuitems[];
@@ -94,6 +98,7 @@ private:
 	static void	cb_sizeSlides(Fl_Widget* o, void* v);
 	static void cb_lineWidthSlides(Fl_Widget* o, void* v);
 	static void cb_lineAngleSlides(Fl_Widget* o, void* v);
+	static void cb_opacitySlides(Fl_Widget* o, void* v);
 
 };
 

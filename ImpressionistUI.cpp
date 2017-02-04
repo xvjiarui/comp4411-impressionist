@@ -378,6 +378,16 @@ void ImpressionistUI::cb_lineAngleSlides(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_nLineAngle=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+//-----------------------------------------------------------
+// Updates the opacity to use from the value of the size
+// slider
+// Called by the UI when the line angle slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_opacitySlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nOpacity=double( ((Fl_Slider *)o)->value() ) ;
+}
+
 //---------------------------------- per instance functions --------------------------------------
 
 //------------------------------------------------
@@ -442,6 +452,14 @@ int ImpressionistUI::getLineAngle()
 	return m_nLineAngle;
 }
 
+//------------------------------------------------
+// Return the opacity
+//------------------------------------------------
+double ImpressionistUI::getOpacity()
+{
+	return m_nOpacity;
+}
+
 //-------------------------------------------------
 // Set the brush size
 //-------------------------------------------------
@@ -473,6 +491,17 @@ void ImpressionistUI::setLineAngle( int angle )
 
 	if (angle<=359) 
 		m_BrushSizeSlider->value(m_nLineAngle);
+}
+
+//-------------------------------------------------
+// Set the opacity
+//-------------------------------------------------
+void ImpressionistUI::setOpacity( double opacity )
+{
+	m_nOpacity=opacity;
+
+	if (opacity<=40) 
+		m_OpacitySlider->value(m_nOpacity);
 }
 
 // Main menu definition
@@ -555,6 +584,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nSize = 10;
 	m_nLineWidth = 1;
 	m_nLineAngle = 0;
+	m_nOpacity = 1.0;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -596,7 +626,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushLineWidthSlider->callback(cb_lineWidthSlides);
 		m_BrushLineWidthSlider->deactivate();
 
-		// Add brush line width slider to the dialog 
+		// Add brush line angle slider to the dialog 
 		m_BrushLineAngleSlider = new Fl_Value_Slider(10, 140, 300, 20, "Line Angle");
 		m_BrushLineAngleSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushLineAngleSlider->type(FL_HOR_NICE_SLIDER);
@@ -609,6 +639,20 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushLineAngleSlider->align(FL_ALIGN_RIGHT);
 		m_BrushLineAngleSlider->callback(cb_lineAngleSlides);
 		m_BrushLineAngleSlider->deactivate();
+
+		// Add opacity slider to the dialog 
+		m_OpacitySlider = new Fl_Value_Slider(10, 170, 300, 20, "Alpha");
+		m_OpacitySlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_OpacitySlider->type(FL_HOR_NICE_SLIDER);
+        m_OpacitySlider->labelfont(FL_COURIER);
+        m_OpacitySlider->labelsize(12);
+		m_OpacitySlider->minimum(0.00);
+		m_OpacitySlider->maximum(1.00);
+		m_OpacitySlider->step(0.01);
+		m_OpacitySlider->value(m_nOpacity);
+		m_OpacitySlider->align(FL_ALIGN_RIGHT);
+		m_OpacitySlider->callback(cb_opacitySlides);
+
 
     m_brushDialog->end();	
 

@@ -50,7 +50,9 @@ void ScatteredCircleBrush::BrushMove( const Point source, const Point target )
 				// srand((unsigned int)(time(NULL)));
 				int index=rand()%(size*size);
 				if (index == 1 || index == 2)
-				{
+				{	
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					glBegin( GL_TRIANGLE_FAN );
 					SetColor( Point(source.x - size/2 + i, source.y - size/2+j));
 

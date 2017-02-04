@@ -116,6 +116,14 @@ int ImpressionistDoc::getLineAngle()
 }
 
 //---------------------------------------------------------
+// Returns the opacity of the brush.
+//---------------------------------------------------------
+double ImpressionistDoc::getOpacity()
+{
+	return m_pUI->getOpacity();
+}
+
+//---------------------------------------------------------
 // Load the specified image
 // This is called by the UI when the load image button is 
 // pressed.

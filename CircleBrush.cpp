@@ -42,6 +42,8 @@ void CircleBrush::BrushMove( const Point source, const Point target )
 	}
 	double radius = pDoc->getSize()/2.0;
 	double twicePi = 2.0 * 3.142;
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBegin( GL_TRIANGLE_FAN );
 		SetColor( source );
 
