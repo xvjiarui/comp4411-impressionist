@@ -55,6 +55,7 @@ ImpressionistDoc::ImpressionistDoc()
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
 	m_nType = 0;
+	m_nDirection = 0;
 
 }
 
@@ -101,7 +102,8 @@ void ImpressionistDoc::setBrushType(int type)
 // type: one of the defined brush types.
 //---------------------------------------------------------
 void ImpressionistDoc::setBrushDirection(int type)
-{
+{	
+	m_nDirection = type;
 	if (type == DIRECTION_SLIDER)
 	{
 		m_pUI->m_BrushLineAngleSlider->activate();
@@ -153,6 +155,10 @@ int ImpressionistDoc::getSize()
 
 int ImpressionistDoc::getBrushType(){
 	return m_nType;
+}
+
+int ImpressionistDoc::getDirectionType(){
+	return m_nDirection;
 }
 
 //---------------------------------------------------------

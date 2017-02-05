@@ -31,6 +31,7 @@ public:
 	int 	getLineWidth();
 	int 	getLineAngle();
 	int 	getBrushType();
+	int 	getDirectionType();
 	void	setSize(int size);				// set the UI size
 	void	setLineAngle(int angle);				// set the UI lineAngle
 	char*	getImageName();					// get the current image name
@@ -59,6 +60,7 @@ public:
 	// Size of the brush.
 	int m_nSize;
 	int m_nType;
+	int m_nDirection;
 
 	// Opacity
 	double m_nOpacity;							
