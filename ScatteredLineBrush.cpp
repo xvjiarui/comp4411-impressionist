@@ -45,6 +45,7 @@ void ScatteredLineBrush::BrushMove( const Point source, const Point target )
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_LINE_SMOOTH);
 	glBegin( GL_LINES );
+	double Pi = 3.14159265;
 	for (int i = 0; i < size; ++i)
 	{
 		for (int j = 0; j < size; ++j)
@@ -55,8 +56,8 @@ void ScatteredLineBrush::BrushMove( const Point source, const Point target )
 			{
 				SetColor( Point(source.x - size/2 + i, source.y - size/2+j));
 
-				glVertex2d( target.x - size/2 + i + cos(angle) * size/2.0, target.y - size/2 + j - sin(angle) * size/2.0);
-				glVertex2d( target.x - size/2 + i - cos(angle) * size/2.0, target.y - size/2 + j + sin(angle) * size/2.0);
+				glVertex2d( target.x - size/2 + i + cos(angle * Pi / 180) * size/2.0, target.y - size/2 + j + sin(angle * Pi / 180) * size/2.0);
+				glVertex2d( target.x - size/2 + i - cos(angle * Pi / 180) * size/2.0, target.y - size/2 + j - sin(angle * Pi / 180) * size/2.0);
 			}
 			
 		}

@@ -336,6 +336,20 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 	pDoc->setBrushType(type);
 }
 
+//-------------------------------------------------------------
+// Sets the direction of brush to use to the one chosen in the brush 
+// choice.  
+// Called by the UI when a brush is chosen in the brush choice
+//-------------------------------------------------------------
+void ImpressionistUI::cb_directionChoice(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI=((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc=pUI->getDocument();
+
+	int type=(int)v;
+	pDoc->setBrushDirection(type);
+}
+
 //------------------------------------------------------------
 // Clears the paintview canvas.
 // Called by the UI when the clear canvas button is pushed
@@ -460,6 +474,7 @@ double ImpressionistUI::getOpacity()
 	return m_nOpacity;
 }
 
+
 //-------------------------------------------------
 // Set the brush size
 //-------------------------------------------------
@@ -479,7 +494,7 @@ void ImpressionistUI::setLineWidth( int width )
 	m_nLineWidth=width;
 
 	if (width<=40) 
-		m_BrushSizeSlider->value(m_nLineWidth);
+		m_BrushLineWidthSlider->value(m_nLineWidth);
 }
 
 //-------------------------------------------------
@@ -490,7 +505,7 @@ void ImpressionistUI::setLineAngle( int angle )
 	m_nLineAngle=angle;
 
 	if (angle<=359) 
-		m_BrushSizeSlider->value(m_nLineAngle);
+		m_BrushLineAngleSlider->value(m_nLineAngle);
 }
 
 //-------------------------------------------------
@@ -548,6 +563,14 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {0}
 };
 
+// Direction choice menu definition
+Fl_Menu_Item ImpressionistUI::brushDirectionMenu[NUM_BRUSH_DIRECTION+1] = {
+  {"SLider/Right Mouse",			FL_ALT+'s', (Fl_Callback *)ImpressionistUI::cb_directionChoice, (void *)DIRECTION_SLIDER},
+  {"Gradient",				FL_ALT+'g', (Fl_Callback *)ImpressionistUI::cb_directionChoice, (void *)DIRECTION_GRADIENT},
+  {"Brush Direction",			FL_ALT+'b', (Fl_Callback *)ImpressionistUI::cb_directionChoice, (void *)DIRECTION_CURSOR},
+  {0}
+};
+
 
 
 //----------------------------------------------------
@@ -598,9 +621,15 @@ ImpressionistUI::ImpressionistUI() {
 		m_ClearCanvasButton->user_data((void*)(this));
 		m_ClearCanvasButton->callback(cb_clear_canvas_button);
 
+		// Add a brush direction choice to the dialog
+		m_BrushDirectionChoice = new Fl_Choice(60,50,150,25,"&Stroke Direction");
+		m_BrushDirectionChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_BrushDirectionChoice->menu(brushDirectionMenu);
+		m_BrushDirectionChoice->callback(cb_directionChoice);
+		m_BrushDirectionChoice->deactivate();
 
 		// Add brush size slider to the dialog 
-		m_BrushSizeSlider = new Fl_Value_Slider(10, 80, 300, 20, "Size");
+		m_BrushSizeSlider = new Fl_Value_Slider(10, 90, 300, 20, "Size");
 		m_BrushSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushSizeSlider->type(FL_HOR_NICE_SLIDER);
         m_BrushSizeSlider->labelfont(FL_COURIER);
@@ -613,7 +642,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushSizeSlider->callback(cb_sizeSlides);
 
 		// Add brush line width slider to the dialog 
-		m_BrushLineWidthSlider = new Fl_Value_Slider(10, 110, 300, 20, "Line Width");
+		m_BrushLineWidthSlider = new Fl_Value_Slider(10, 120, 300, 20, "Line Width");
 		m_BrushLineWidthSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushLineWidthSlider->type(FL_HOR_NICE_SLIDER);
         m_BrushLineWidthSlider->labelfont(FL_COURIER);
@@ -627,7 +656,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushLineWidthSlider->deactivate();
 
 		// Add brush line angle slider to the dialog 
-		m_BrushLineAngleSlider = new Fl_Value_Slider(10, 140, 300, 20, "Line Angle");
+		m_BrushLineAngleSlider = new Fl_Value_Slider(10, 150, 300, 20, "Line Angle");
 		m_BrushLineAngleSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushLineAngleSlider->type(FL_HOR_NICE_SLIDER);
         m_BrushLineAngleSlider->labelfont(FL_COURIER);
@@ -641,7 +670,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushLineAngleSlider->deactivate();
 
 		// Add opacity slider to the dialog 
-		m_OpacitySlider = new Fl_Value_Slider(10, 170, 300, 20, "Alpha");
+		m_OpacitySlider = new Fl_Value_Slider(10, 180, 300, 20, "Alpha");
 		m_OpacitySlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_OpacitySlider->type(FL_HOR_NICE_SLIDER);
         m_OpacitySlider->labelfont(FL_COURIER);

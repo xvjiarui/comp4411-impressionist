@@ -21,6 +21,16 @@ enum
 	NUM_BRUSH_TYPE // Make sure this stays at the end!
 };
 
+// Each brush direction has an associated constant.
+enum
+{
+	DIRECTION_SLIDER = 0,
+	DIRECTION_GRADIENT,
+	DIRECTION_CURSOR,
+	NUM_BRUSH_DIRECTION // Make sure this stays at the end!
+};
+
+
 
 class ImpressionistDoc; // Pre-declaring class
 

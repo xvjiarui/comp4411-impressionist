@@ -25,12 +25,20 @@ public:
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	void	setBrushType(int type);			// called by the UI to set the brushType
+	void	setBrushDirection(int direction);			// called by the UI to set the brushDirection
 	int		getSize();						// get the UI size
 	double 	getOpacity();
 	int 	getLineWidth();
 	int 	getLineAngle();
+	int 	getBrushType();
 	void	setSize(int size);				// set the UI size
+	void	setLineAngle(int angle);				// set the UI lineAngle
 	char*	getImageName();					// get the current image name
+
+	void 	setStartPoint(Point start);
+	void 	setEndPoint(Point start);
+	int 	rightMouseAngle();
+	int 	rightMouseSize();
 	
 
 // Attributes
@@ -50,11 +58,16 @@ public:
 	ImpBrush*			m_pCurrentBrush;	
 	// Size of the brush.
 	int m_nSize;
+	int m_nType;
 
 	// Opacity
 	double m_nOpacity;							
 
 	ImpressionistUI*	m_pUI;
+
+	// Right mouse control
+	Point startPoint;
+	Point endPoint;
 
 // Operations
 public:
@@ -62,7 +75,6 @@ public:
 	GLubyte* GetOriginalPixel( int x, int y );   
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetOriginalPixel( const Point p );  
-
 
 private:
 	char			m_imageName[256];

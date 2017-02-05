@@ -35,6 +35,7 @@ void LineBrush::BrushMove( const Point source, const Point target )
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg=pDoc->m_pUI;
 	double size = pDoc->getSize()/2;
+	double Pi=3.14159265;
 	int angle = pDoc->getLineAngle();
 	if ( pDoc == NULL ) {
 		printf( "LineBrush::BrushMove  document is NULL\n" );
@@ -45,8 +46,9 @@ void LineBrush::BrushMove( const Point source, const Point target )
 	glEnable(GL_LINE_SMOOTH);
 	glBegin( GL_LINES );
 		SetColor( source );
-		glVertex2d( target.x + cos(angle) * size, target.y - sin(angle) * size);
-		glVertex2d( target.x - cos(angle) * size, target.y + sin(angle) * size);
+		glVertex2d( target.x + (cos(angle * Pi / 180) * size), target.y + (sin(angle * Pi / 180) * size));
+		glVertex2d( target.x - (cos(angle * Pi / 180) * size), target.y - (sin(angle * Pi / 180) * size));
+		printf("%f\n", cos(angle * Pi / 180) * size );
 
 	glEnd();
 }

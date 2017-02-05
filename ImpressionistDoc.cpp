@@ -6,6 +6,7 @@
 //
 
 #include <FL/fl_ask.H>
+#include <math.h>
 
 #include "impressionistDoc.h"
 #include "impressionistUI.h"
@@ -53,6 +54,7 @@ ImpressionistDoc::ImpressionistDoc()
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
+	m_nType = 0;
 
 }
 
@@ -80,15 +82,65 @@ char* ImpressionistDoc::getImageName()
 void ImpressionistDoc::setBrushType(int type)
 {
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[type];
+	m_nType = type;
 	if (type == BRUSH_LINES || type == BRUSH_SCATTERED_LINES)
 	{
 		m_pUI->m_BrushLineWidthSlider->activate();
 		m_pUI->m_BrushLineAngleSlider->activate();
+		m_pUI->m_BrushDirectionChoice->activate();
 	}
 	else {
 		m_pUI->m_BrushLineWidthSlider->deactivate();
 		m_pUI->m_BrushLineAngleSlider->deactivate();
+		m_pUI->m_BrushDirectionChoice->deactivate();
 	}
+}
+
+//---------------------------------------------------------
+// Called by the UI when the user changes the brush direction.
+// type: one of the defined brush types.
+//---------------------------------------------------------
+void ImpressionistDoc::setBrushDirection(int type)
+{
+	if (type == DIRECTION_SLIDER)
+	{
+		m_pUI->m_BrushLineAngleSlider->activate();
+	}
+	else m_pUI->m_BrushLineAngleSlider->deactivate();
+}
+void ImpressionistDoc:: setSize(int size){
+	m_pUI->setSize(size);
+}
+
+void ImpressionistDoc::setLineAngle(int angle){
+	m_pUI->setLineAngle(angle);
+}
+
+void ImpressionistDoc::setStartPoint(Point start){
+	startPoint=start;
+}
+
+void ImpressionistDoc::setEndPoint(Point end){
+	endPoint=end;
+}
+
+int ImpressionistDoc::rightMouseAngle(){
+	int result = atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x) * 180 / 3.14159265;
+	if (result < 0)
+	{
+		result+=360;
+	}
+	return result;
+}
+int ImpressionistDoc::rightMouseSize(){
+	int x1=startPoint.x;
+	int x2=endPoint.x;
+	int y1=startPoint.y;
+	int y2=endPoint.y;
+	int del_x=x2-x1;
+	int del_y=y2-y1;
+	int result =  sqrt(del_x*del_x + del_y*del_y);
+	return result;
 }
 
 //---------------------------------------------------------
@@ -97,6 +149,10 @@ void ImpressionistDoc::setBrushType(int type)
 int ImpressionistDoc::getSize()
 {
 	return m_pUI->getSize();
+}
+
+int ImpressionistDoc::getBrushType(){
+	return m_nType;
 }
 
 //---------------------------------------------------------

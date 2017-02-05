@@ -117,13 +117,19 @@ void PaintView::draw()
 			RestoreContent();
 			break;
 		case RIGHT_MOUSE_DOWN:
-
+			m_pDoc->setStartPoint(target);
 			break;
 		case RIGHT_MOUSE_DRAG:
 
 			break;
 		case RIGHT_MOUSE_UP:
-
+			m_pDoc->setEndPoint(target);
+			if (m_pDoc->getBrushType() == 1 || m_pDoc->getBrushType() == 4)
+			{
+				m_pDoc->setLineAngle(m_pDoc->rightMouseAngle());
+				m_pDoc->setSize(m_pDoc->rightMouseSize());
+			}
+			
 			break;
 
 		default:
