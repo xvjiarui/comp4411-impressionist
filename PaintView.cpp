@@ -100,7 +100,9 @@ void PaintView::draw()
 
 		Point source( coord.x + m_nStartCol, m_nEndRow - coord.y );
 		Point target( coord.x, m_nWindowHeight - coord.y );
-		
+		// printf("x:%d y:%d\n", coord.x,coord.y);
+		// printf("x:%d y:%d\n", coord.x+m_nStartCol,m_nEndRow - coord.y);
+		// printf("x:%d y:%d\n", coord.x,m_nWindowHeight - coord.y);
 		// This is the event handler
 		switch (eventToDo) 
 		{
@@ -109,6 +111,7 @@ void PaintView::draw()
 			break;
 		case LEFT_MOUSE_DRAG:
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
+			m_pDoc->m_pUI->m_origView->cursor(coord);
 			break;
 		case LEFT_MOUSE_UP:
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
@@ -120,7 +123,16 @@ void PaintView::draw()
 			m_pDoc->setStartPoint(target);
 			break;
 		case RIGHT_MOUSE_DRAG:
-
+			RestoreContent();
+			m_pDoc->setEndPoint(target);
+			glLineWidth(0.5);
+			glEnable(GL_LINE_SMOOTH);
+			glBegin( GL_LINE );
+				glColor3f(1, 0, 0);
+				glVertex2d(m_pDoc->startPoint.x , m_pDoc->startPoint.y);
+				glVertex2d(m_pDoc->endPoint.x , m_pDoc->endPoint.y);
+			glEnd();
+			
 			break;
 		case RIGHT_MOUSE_UP:
 			m_pDoc->setEndPoint(target);
@@ -129,7 +141,7 @@ void PaintView::draw()
 				m_pDoc->setLineAngle(m_pDoc->rightMouseAngle());
 				m_pDoc->setSize(m_pDoc->rightMouseSize());
 			}
-			
+			RestoreContent();
 			break;
 
 		default:
@@ -188,6 +200,7 @@ int PaintView::handle(int event)
 	case FL_MOVE:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
+		m_pDoc->m_pUI->m_origView->cursor(coord);
 		break;
 	default:
 		return 0;
