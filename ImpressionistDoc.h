@@ -40,6 +40,8 @@ public:
 	void 	setEndPoint(Point start);
 	int 	rightMouseAngle();
 	int 	rightMouseSize();
+
+	void swapViews();
 	
 
 // Attributes

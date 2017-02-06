@@ -286,7 +286,6 @@ void ImpressionistUI::cb_edge_image(Fl_Menu_* o, void* v)
 }
 
 //------------------------------------------------------------
-// Causes the Impressionist program to exit
 // Called by the UI when the another_image menu item is chosen
 //------------------------------------------------------------
 void ImpressionistUI::cb_another_image(Fl_Menu_* o, void* v) 
@@ -295,7 +294,14 @@ void ImpressionistUI::cb_another_image(Fl_Menu_* o, void* v)
 }
 
 //------------------------------------------------------------
-// Causes the Impressionist program to exit
+// Called by the UI when the swap_views menu item is chosen
+//------------------------------------------------------------
+void ImpressionistUI::cb_swap_views(Fl_Menu_* o, void* v){
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	pDoc->swapViews();
+}
+
+//------------------------------------------------------------
 // Called by the UI when the faster menu item is chosen
 //------------------------------------------------------------
 void ImpressionistUI::cb_faster(Fl_Menu_* o, void* v) 
@@ -538,6 +544,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Original Image",	FL_ALT + 'o', (Fl_Callback *)ImpressionistUI::cb_original_image },
 		{ "&Edge Image",	FL_ALT + 'e', (Fl_Callback *)ImpressionistUI::cb_edge_image },
 		{ "&Another Image",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_another_image }, 
+		{ "&Swap views", FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_swap_views},
 		{ 0 },
 
 	{ "&Options",		0, 0, 0, FL_SUBMENU },

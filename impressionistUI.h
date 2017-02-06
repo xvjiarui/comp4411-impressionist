@@ -92,6 +92,7 @@ private:
 	static void cb_original_image(Fl_Menu_* o, void* v);
 	static void cb_edge_image(Fl_Menu_* o, void* v);
 	static void cb_another_image(Fl_Menu_* o, void* v);
+	static void cb_swap_views(Fl_Menu_* o, void* v);
 	static void cb_faster(Fl_Menu_* o, void* v);
 	static void cb_safer(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
@@ -102,6 +103,7 @@ private:
 	static void cb_lineWidthSlides(Fl_Widget* o, void* v);
 	static void cb_lineAngleSlides(Fl_Widget* o, void* v);
 	static void cb_opacitySlides(Fl_Widget* o, void* v);
+
 
 };
 
