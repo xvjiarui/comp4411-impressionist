@@ -40,8 +40,9 @@ public:
 	void 	setEndPoint(Point start);
 	int 	rightMouseAngle();
 	int 	rightMouseSize();
-
-	void swapViews();
+	void 	saveTemp();
+	void 	undo();
+	void 	swapViews();
 	
 
 // Attributes
@@ -55,6 +56,7 @@ public:
 	// Bitmaps for original image and painting.
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucPainting;
+	unsigned char* 	m_ucPrePainting;
 
 
 	// The current active brush.

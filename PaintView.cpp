@@ -104,6 +104,7 @@ void PaintView::draw()
 		// printf("x:%d y:%d\n", coord.x+m_nStartCol,m_nEndRow - coord.y);
 		// printf("x:%d y:%d\n", coord.x,m_nWindowHeight - coord.y);
 		// This is the event handler
+		m_pDoc->saveTemp();
 		switch (eventToDo) 
 		{
 		case LEFT_MOUSE_DOWN:

@@ -95,6 +95,7 @@ private:
 	static void cb_swap_views(Fl_Menu_* o, void* v);
 	static void cb_faster(Fl_Menu_* o, void* v);
 	static void cb_safer(Fl_Menu_* o, void* v);
+	static void cb_undo(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void	cb_directionChoice(Fl_Widget* o, void* v);

@@ -32,7 +32,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
-
+	m_ucPrePainting = NULL;
 
 	// create one instance of each brush
 	ImpBrush::c_nBrushCount	= NUM_BRUSH_TYPE;
@@ -263,6 +263,30 @@ void ImpressionistDoc::swapViews(){
 
 	m_ucPainting = temp;
 
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(width, height);	
+	m_pUI->m_origView->refresh();
+	// refresh paint view as well
+	m_pUI->m_paintView->resizeWindow(width, height);	
+	m_pUI->m_paintView->refresh();
+}
+
+void ImpressionistDoc::saveTemp(){
+	int width, height;
+	width = m_nWidth;
+	height = m_nHeight;
+	if ( m_ucPrePainting ) delete [] m_ucPrePainting;
+	m_ucPrePainting	= new unsigned char [width*height*3];
+	memcpy ( m_ucPrePainting, m_ucPainting, width*height*3 );
+}
+
+void ImpressionistDoc::undo(){
+	int width, height;
+	width = m_nWidth;
+	height = m_nHeight;
+	if ( m_ucPainting ) delete [] m_ucPainting;
+	m_ucPainting	= new unsigned char [width*height*3];
+	memcpy ( m_ucPainting, m_ucPrePainting, width*height*3 );
 	// display it on origView
 	m_pUI->m_origView->resizeWindow(width, height);	
 	m_pUI->m_origView->refresh();

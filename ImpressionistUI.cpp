@@ -310,12 +310,20 @@ void ImpressionistUI::cb_faster(Fl_Menu_* o, void* v)
 }
 
 //------------------------------------------------------------
-// Causes the Impressionist program to exit
 // Called by the UI when the safer menu item is chosen
 //------------------------------------------------------------
 void ImpressionistUI::cb_safer(Fl_Menu_* o, void* v) 
 {	
 	fl_message("Safer todo");
+}
+
+//------------------------------------------------------------
+// Called by the UI when the undo menu item is chosen
+//------------------------------------------------------------
+void ImpressionistUI::cb_undo(Fl_Menu_* o, void* v) 
+{	
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	pDoc->undo();
 }
 
 //-----------------------------------------------------------
@@ -550,6 +558,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&Options",		0, 0, 0, FL_SUBMENU },
 		{ "&Faster",	FL_ALT + 'f', (Fl_Callback *)ImpressionistUI::cb_faster },
 		{ "&Sager",	FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_safer },
+		{ "&Undo", FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_undo },
 		{ 0 },
 
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
