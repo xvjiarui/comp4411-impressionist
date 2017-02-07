@@ -7,6 +7,7 @@
 
 #include <FL/fl_ask.h>
 #include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Color_Chooser.H>
 #include <math.h>
 
 #include "impressionistUI.h"
@@ -225,7 +226,7 @@ void ImpressionistUI::cb_clear_canvas(Fl_Menu_* o, void* v)
 //------------------------------------------------------------
 
 void ImpressionistUI::cb_colors(Fl_Menu_* o, void* v){
-	fl_message("Colors todo");
+	int y = fl_color_chooser("Color",m_nR,m_nG,m_nB);
 }
 
 //------------------------------------------------------------
@@ -488,6 +489,39 @@ double ImpressionistUI::getOpacity()
 	return m_nOpacity;
 }
 
+//------------------------------------------------
+// Return the R
+//------------------------------------------------
+double ImpressionistUI::getR()
+{
+	return m_nR;
+}
+
+//------------------------------------------------
+// Return the G
+//------------------------------------------------
+double ImpressionistUI::getG()
+{
+	return m_nG;
+}
+
+//------------------------------------------------
+// Return the B
+//------------------------------------------------
+double ImpressionistUI::getB()
+{
+	return m_nB;
+}
+
+//------------------------------------------------
+// Reset RGB default 1 1 1
+//------------------------------------------------
+void ImpressionistUI::resetRGB(double r, double g, double b)
+{
+	m_nR = r;
+	m_nG = g;
+	m_nB = b;
+}
 
 //-------------------------------------------------
 // Set the brush size
@@ -587,7 +621,9 @@ Fl_Menu_Item ImpressionistUI::brushDirectionMenu[NUM_BRUSH_DIRECTION+1] = {
   {0}
 };
 
-
+double ImpressionistUI:: m_nR(1.0);
+double ImpressionistUI:: m_nG(1.0);
+double ImpressionistUI:: m_nB(1.0);
 
 //----------------------------------------------------
 // Constructor.  Creates all of the widgets.

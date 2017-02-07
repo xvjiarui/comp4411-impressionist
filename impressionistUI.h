@@ -57,6 +57,10 @@ public:
 	int 				getLineWidth();
 	int 				getLineAngle();
 	double				getOpacity();
+	double				getR();
+	double				getG();
+	double				getB();
+	void 				resetRGB(double r = 1, double g = 1, double b = 1);
 	void				setSize(int size);
 	void 				setLineWidth(int width);
 	void 				setLineAngle(int angle);
@@ -70,6 +74,9 @@ private:
 	int 	m_nLineWidth;
 	int 	m_nLineAngle;
 	double 	m_nOpacity;
+	static double	m_nR;
+	static double	m_nG;
+	static double	m_nB;
 
 	// Static class members
 	static Fl_Menu_Item		menuitems[];
