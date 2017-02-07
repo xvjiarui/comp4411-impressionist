@@ -238,6 +238,20 @@ void ImpressionistUI::cb_paintly(Fl_Menu_* o, void* v){
 	fl_message("Paintly todo");
 }
 
+//------------------------------------------------------------------
+// Brings up a file chooser and then loads the chosen image
+// This is called by the UI when the load image menu item is chosen
+//------------------------------------------------------------------
+void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v) 
+{
+	ImpressionistDoc *pDoc=whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Dissolve File?", "*.bmp", pDoc->getImageName() );
+	if (newfile != NULL) {
+		pDoc->dissolveImage(newfile);
+	}
+}
+
 //------------------------------------------------------------
 // Load Edge Image function
 // Called by the UI when the load_edge_image menu item is chosen
@@ -584,6 +598,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
 		{ "&Colors", FL_ALT + 'k', (Fl_Callback *)ImpressionistUI::cb_colors },
 		{ "&Paintly", FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_paintly, 0, FL_MENU_DIVIDER},
+		{ "&Dissolve Image", FL_ALT + 'd', (Fl_Callback *)ImpressionistUI::cb_load_dissolve_image},
 		{ "&Load Edge Image", FL_ALT + 'e', (Fl_Callback *)ImpressionistUI::cb_load_edge_image},
 		{ "&Load Another Image", FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_load_another_image, 0, FL_MENU_DIVIDER},
 

@@ -32,6 +32,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucAnotherBitmap = NULL;
+	m_ucDissolveBitmap = NULL;
 	m_ucPainting	= NULL;
 	m_ucPrePainting = NULL;
 
@@ -225,6 +226,53 @@ int ImpressionistDoc::loadImage(char *iname)
 								width*2, 
 								height+25);
 
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(width, height);	
+	m_pUI->m_origView->refresh();
+
+	// refresh paint view as well
+	m_pUI->m_paintView->resizeWindow(width, height);	
+	m_pUI->m_paintView->refresh();
+
+
+	return 1;
+}
+
+//---------------------------------------------------------
+// Dissolve the specified image
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::dissolveImage(char *iname) 
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width, 
+					height;
+
+	if ( (data=readBMP(iname, width, height))==NULL ) 
+	{
+		fl_alert("Can't load bitmap file");
+		if (width != m_nWidth || height != m_nHeight)
+		{
+			fl_alert("Diffent size");
+		}
+		return 0;
+	}
+
+	// reflect the fact of loading the new image
+	m_nWidth		= width;
+	m_nPaintWidth	= width;
+	m_nHeight		= height;
+	m_nPaintHeight	= height;
+
+	m_ucDissolveBitmap		= data;
+
+	double alpha = 0.5;
+	for (int i = 0; i < 3 * m_nWidth * m_nHeight; ++i)
+	{
+		m_ucBitmap[i] = m_ucBitmap[i] * (1 - alpha * 1) + m_ucDissolveBitmap[i] * alpha * 1; // alpha mask set to all 1
+	}
 	// display it on origView
 	m_pUI->m_origView->resizeWindow(width, height);	
 	m_pUI->m_origView->refresh();
