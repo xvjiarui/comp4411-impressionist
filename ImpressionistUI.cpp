@@ -253,7 +253,11 @@ void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v){
 //------------------------------------------------------------
 
 void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v){
-	fl_message("Load Another Image todo");
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	char* newfile = fl_file_chooser("Open Another File?", "*.bmp", pDoc->getImageName() );
+	if (newfile != NULL) {
+		pDoc->loadAnotherImage(newfile);
+	}
 }
 
 
@@ -274,7 +278,9 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 //------------------------------------------------------------
 void ImpressionistUI::cb_original_image(Fl_Menu_* o, void* v) 
 {
-	fl_message("Original Image todo");
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	pDoc->m_pUI->m_origView->imageIndex = 0;
+	pDoc->m_pUI->m_origView->refresh();
 }
 
 //------------------------------------------------------------
@@ -290,8 +296,10 @@ void ImpressionistUI::cb_edge_image(Fl_Menu_* o, void* v)
 // Called by the UI when the another_image menu item is chosen
 //------------------------------------------------------------
 void ImpressionistUI::cb_another_image(Fl_Menu_* o, void* v) 
-{
-	fl_message("Another Image todo");
+{	
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	pDoc->m_pUI->m_origView->imageIndex = 2;
+	pDoc->m_pUI->m_origView->refresh();
 }
 
 //------------------------------------------------------------

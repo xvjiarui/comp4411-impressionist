@@ -31,6 +31,7 @@ public:
 	void resizeWindow(int width, int height);
 
 	ImpressionistDoc*	m_pDoc;
+	static int imageIndex;
 
 private:
 	int	m_nWindowWidth, 

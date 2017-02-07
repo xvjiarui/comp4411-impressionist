@@ -12,6 +12,8 @@
 #define min(a, b)	( ( (a)<(b) ) ? (a) : (b) )
 #endif
 
+int OriginalView:: imageIndex = 0;
+
 OriginalView::OriginalView(int			x, 
 						   int			y, 
 						   int			w, 
@@ -42,7 +44,13 @@ void OriginalView::draw()
 
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	if ( m_pDoc->m_ucBitmap ) 
+	unsigned char* imageChoice = m_pDoc->m_ucBitmap; 
+	if (imageIndex == 2)
+	{
+		imageChoice = m_pDoc->m_ucAnotherBitmap;
+	}
+
+	if ( imageChoice ) 
 	{
 		// note that both OpenGL pixel storage and the Windows BMP format
 		// store pixels left-to-right, BOTTOM-to-TOP!!  thus all the fiddling
@@ -66,7 +74,7 @@ void OriginalView::draw()
 			startrow = 0;
 
 
-		bitstart = m_pDoc->m_ucBitmap + 3 * ((m_pDoc->m_nWidth * startrow) + scrollpos.x);
+		bitstart = imageChoice + 3 * ((m_pDoc->m_nWidth * startrow) + scrollpos.x);
 
 		// just copy image to GLwindow conceptually
 		glRasterPos2i( 0, m_nWindowHeight - drawHeight );
