@@ -73,7 +73,7 @@ private:
 	int		m_nSize;
 	int 	m_nLineWidth;
 	int 	m_nLineAngle;
-	double 	m_nOpacity;
+	double 	m_dOpacity;
 	static double	m_nR;
 	static double	m_nG;
 	static double	m_nB;

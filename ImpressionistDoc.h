@@ -9,6 +9,7 @@
 
 #include "impressionist.h"
 #include "bitmap.h"
+#include "Filter.h"
 
 class ImpressionistUI;
 
@@ -47,6 +48,7 @@ public:
 	void 	swapViews();
 	
 
+
 // Attributes
 public:
 	// Dimensions of original window.
@@ -59,9 +61,11 @@ public:
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucAnotherBitmap;
 	unsigned char* 	m_ucDissolveBitmap;
+	unsigned char*	m_ucEdgeBitmap;
 	unsigned char*	m_ucPainting;
 	unsigned char* 	m_ucPrePainting;
-
+	int* 			m_nGradientxy;
+	int* 			m_nGradientValue;
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
@@ -71,7 +75,7 @@ public:
 	int m_nDirection;
 
 	// Opacity
-	double m_nOpacity;							
+	double m_dOpacity;							
 
 	ImpressionistUI*	m_pUI;
 
@@ -79,12 +83,26 @@ public:
 	Point startPoint;
 	Point endPoint;
 
+	// filters
+	Filter<int>* f_SobelX;
+	Filter<int>* f_SobelY;
+	Filter<double>* f_Gaussian;
+	Filter<int>* f_Sharpen;
+
+
 // Operations
 public:
 	// Get the color of the original picture at the specified coord
 	GLubyte* GetOriginalPixel( int x, int y );   
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetOriginalPixel( const Point p );  
+	// calculate gradient
+	void calculateGradient(unsigned char* source, int* gradientxy, int* value );
+	// Calculate edge image
+	GLubyte* ImpressionistDoc::calculateEdgeMap(int threshold = 100);
+
+	static GLubyte grayPixel(double r, double g, double b);
+	static GLubyte grayPixel( GLubyte*  pixel);
 
 private:
 	char			m_imageName[256];

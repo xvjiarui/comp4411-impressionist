@@ -24,7 +24,8 @@
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
 
-ImpressionistDoc::ImpressionistDoc() 
+
+ImpressionistDoc::ImpressionistDoc()
 {
 	// Set NULL image name as init. 
 	m_imageName[0]	='\0';	
@@ -32,9 +33,13 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucAnotherBitmap = NULL;
+	m_ucEdgeBitmap = NULL;
 	m_ucDissolveBitmap = NULL;
 	m_ucPainting	= NULL;
 	m_ucPrePainting = NULL;
+
+	m_nGradientxy = NULL;
+	m_nGradientValue = NULL;
 
 	// create one instance of each brush
 	ImpBrush::c_nBrushCount	= NUM_BRUSH_TYPE;
@@ -58,6 +63,29 @@ ImpressionistDoc::ImpressionistDoc()
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
 	m_nType = 0;
 	m_nDirection = 0;
+
+	// init filter
+	int SobelX[9] = { -1, 0, 1,
+	-2, 0, 2,
+	-1, 0, 1 }; //NOTE: Y from bottom to top
+
+	int SobelY[9] = { -1, -2, -1,
+	0, 0, 0,
+	1, 2, 1 };
+
+	double Gaussian[9] = { 0.0625, 0.125, 0.0625,
+	0.125, 0.250, 0.125,
+	0.0625, 0.125, 0.0625 };
+	
+	int Sharpen[9] = {
+		0, -1, 0,
+		-1, 5, -1,
+		0, -1, 0
+	};
+	f_SobelX = new Filter<int>(SobelX,3,3);
+	f_SobelY = new Filter<int>(SobelY,3,3);
+	f_Gaussian = new Filter<double>(Gaussian,3,3);
+	f_Sharpen = new Filter<int>(Sharpen,3,3);
 
 }
 
@@ -214,6 +242,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	// release old storage
 	if ( m_ucBitmap ) delete [] m_ucBitmap;
 	if ( m_ucPainting ) delete [] m_ucPainting;
+	if ( m_ucEdgeBitmap) delete[] m_ucEdgeBitmap;
 
 	m_ucBitmap		= data;
 
@@ -225,6 +254,15 @@ int ImpressionistDoc::loadImage(char *iname)
 								m_pUI->m_mainWindow->y(), 
 								width*2, 
 								height+25);
+
+	// Calculate Gradient
+	m_nGradientxy = new int [2 * width * height];
+	m_nGradientValue = new int [width * height];
+	calculateGradient(m_ucBitmap, m_nGradientxy, m_nGradientValue);
+
+	// allocate space for edge view
+	m_ucEdgeBitmap = new GLubyte[3*width*height];
+	calculateEdgeMap();
 
 	// display it on origView
 	m_pUI->m_origView->resizeWindow(width, height);	
@@ -450,5 +488,70 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( int x, int y )
 GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
+}
+
+void ImpressionistDoc::calculateGradient(unsigned char* source, int* gradientxy, int* value ){
+	int width = m_nPaintWidth, height = m_nPaintHeight;
+
+	//calculate the intensity
+	GLubyte * grayImage = new GLubyte[width * height];
+	for (int i = 0; i < width; ++i)
+	{
+		for (int j = 0; j < height; ++j)
+		{
+			grayImage[j * width + i] = grayPixel(&source[3 * (j * width + i)]);
+		}
+	}
+
+	//Apply gaussian filter to blur
+	GLubyte* blurredImage = new GLubyte[width*height];
+	for (int i = 0; i < width; ++i)
+	{
+		for (int j = 0; j < height; ++j)
+		{
+			blurredImage[j * width + i] = f_Gaussian->applyToPixel(grayImage, width, height, i, j);
+			// printf("%d\n", blurredImage[j * width + i]);
+		}
+	}
+	//Calculate the gradient
+	for (int i = 0; i < width; ++i)
+	{
+		for (int j = 0; j < height; ++j)
+		{
+			int pos = i + j * width;
+			gradientxy[2 * pos] = f_SobelX->applyToPixel(blurredImage, width, height, i, j);
+			gradientxy[2 * pos + 1] = f_SobelY->applyToPixel(blurredImage, width, height, i, j);
+			value[pos] = sqrt(pow(gradientxy[2 * pos], 2) + pow(gradientxy[2 * pos + 1], 2));
+		}
+	}
+}
+
+// Calculate edge with given threshold, and store it.
+GLubyte* ImpressionistDoc::calculateEdgeMap(int threshold)
+{
+	if (!m_ucEdgeBitmap) return NULL;
+
+	int pos = 0;
+	for (int i = 0; i < m_nPaintWidth; ++i)
+		for (int j = 0; j < m_nPaintHeight; ++j)
+		{
+			pos = (j * m_nPaintWidth + i);
+			m_ucEdgeBitmap[3*pos] = m_nGradientValue[pos] > threshold ? 255 : 0;
+			m_ucEdgeBitmap[3*pos+1] = m_nGradientValue[pos] > threshold ? 255 : 0;
+			m_ucEdgeBitmap[3*pos+2] = m_nGradientValue[pos] > threshold ? 255 : 0;
+		}
+	//return the calculated Edge
+	return m_ucEdgeBitmap;
+}
+
+GLubyte ImpressionistDoc:: grayPixel(double r, double g, double b)
+{
+	double result = 0.299 * r + 0.587 * g + 0.144 * b;
+	return (result > 255) ? 255 : (GLubyte) result; //cap the value to prevent overflow
+}
+
+GLubyte ImpressionistDoc:: grayPixel( GLubyte*  pixel)
+{
+	return grayPixel(pixel[0], pixel[1], pixel[2]);
 }
 

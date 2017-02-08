@@ -303,7 +303,9 @@ void ImpressionistUI::cb_original_image(Fl_Menu_* o, void* v)
 //------------------------------------------------------------
 void ImpressionistUI::cb_edge_image(Fl_Menu_* o, void* v) 
 {
-	fl_message("Edge Image todo");
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	pDoc->m_pUI->m_origView->imageIndex = 1;
+	pDoc->m_pUI->m_origView->refresh();
 }
 
 //------------------------------------------------------------
@@ -436,7 +438,7 @@ void ImpressionistUI::cb_lineAngleSlides(Fl_Widget* o, void* v)
 //-----------------------------------------------------------
 void ImpressionistUI::cb_opacitySlides(Fl_Widget* o, void* v)
 {
-	((ImpressionistUI*)(o->user_data()))->m_nOpacity=double( ((Fl_Slider *)o)->value() ) ;
+	((ImpressionistUI*)(o->user_data()))->m_dOpacity=double( ((Fl_Slider *)o)->value() ) ;
 }
 
 //---------------------------------- per instance functions --------------------------------------
@@ -508,7 +510,7 @@ int ImpressionistUI::getLineAngle()
 //------------------------------------------------
 double ImpressionistUI::getOpacity()
 {
-	return m_nOpacity;
+	return m_dOpacity;
 }
 
 //------------------------------------------------
@@ -583,10 +585,10 @@ void ImpressionistUI::setLineAngle( int angle )
 //-------------------------------------------------
 void ImpressionistUI::setOpacity( double opacity )
 {
-	m_nOpacity=opacity;
+	m_dOpacity=opacity;
 
 	if (opacity<=40) 
-		m_OpacitySlider->value(m_nOpacity);
+		m_OpacitySlider->value(m_dOpacity);
 }
 
 // Main menu definition
@@ -682,7 +684,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nSize = 10;
 	m_nLineWidth = 1;
 	m_nLineAngle = 0;
-	m_nOpacity = 1.0;
+	m_dOpacity = 1.0;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -753,7 +755,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_OpacitySlider->minimum(0.00);
 		m_OpacitySlider->maximum(1.00);
 		m_OpacitySlider->step(0.01);
-		m_OpacitySlider->value(m_nOpacity);
+		m_OpacitySlider->value(m_dOpacity);
 		m_OpacitySlider->align(FL_ALIGN_RIGHT);
 		m_OpacitySlider->callback(cb_opacitySlides);
 
