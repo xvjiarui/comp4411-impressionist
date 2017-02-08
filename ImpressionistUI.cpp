@@ -441,6 +441,76 @@ void ImpressionistUI::cb_opacitySlides(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_dOpacity=double( ((Fl_Slider *)o)->value() ) ;
 }
 
+//-----------------------------------------------------------
+// Updates the spacing to use from the value of the size
+// slider
+// Called by the UI when the spacing slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_spacing_slide(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nSpacing=int( ((Fl_Slider *)o)->value() ) ;
+}
+
+//-----------------------------------------------------------
+// Updates the threshold to use from the value of the size
+// slider
+// Called by the UI when the threshold slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_threshold_slide(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nThreshold=int( ((Fl_Slider *)o)->value() ) ;
+}
+
+void ImpressionistUI::cb_edge_clipping_lbutton(Fl_Widget* o, void* v)
+{
+	ImpressionistUI *pUI=((ImpressionistUI*)(o->user_data()));
+
+	if (pUI->m_bEdgeClipping==TRUE) pUI->m_bEdgeClipping=FALSE;
+	else pUI->m_bEdgeClipping=TRUE;
+}
+
+void ImpressionistUI::cb_another_gradient_lbutton(Fl_Widget* o, void* v)
+{
+	ImpressionistUI *pUI=((ImpressionistUI*)(o->user_data()));
+
+	if (pUI->m_bAnotherGradient==TRUE) pUI->m_bAnotherGradient=FALSE;
+	else pUI->m_bAnotherGradient=TRUE;
+}
+
+void ImpressionistUI::cb_size_random_lbutton(Fl_Widget* o, void* v)
+{
+	ImpressionistUI *pUI=((ImpressionistUI*)(o->user_data()));
+
+	if (pUI->m_bSizeRandom==TRUE) pUI->m_bSizeRandom=FALSE;
+	else pUI->m_bSizeRandom=TRUE;
+}
+
+//------------------------------------------------------------
+// Auto painting
+// Called by the UI when the clear canvas button is pushed
+//------------------------------------------------------------
+void ImpressionistUI::cb_auto_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->m_pUI->m_paintView->triggerAutoPaint();
+}
+
+//------------------------------------------------------------
+// Clears the paintview canvas.
+// Called by the UI when the clear canvas button is pushed
+//------------------------------------------------------------
+void ImpressionistUI::cb_threshold_change_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->changeThreshold();
+	pDoc->m_pUI->m_origView->imageIndex = 1;
+	pDoc->m_pUI->m_origView->refresh();
+}
+
+
+
 //---------------------------------- per instance functions --------------------------------------
 
 //------------------------------------------------
@@ -535,6 +605,30 @@ double ImpressionistUI::getG()
 double ImpressionistUI::getB()
 {
 	return m_nB;
+}
+
+//------------------------------------------------
+// Return the threshold
+//------------------------------------------------
+int ImpressionistUI::getThreshold()
+{
+	return m_nThreshold;
+}
+
+//------------------------------------------------
+// Return the threshold
+//------------------------------------------------
+int ImpressionistUI::getSpacing()
+{
+	return m_nSpacing;
+}
+
+//------------------------------------------------
+// Return the sizeRandom
+//------------------------------------------------
+bool ImpressionistUI::getSizeRandom()
+{
+	return m_bSizeRandom;
 }
 
 //------------------------------------------------
@@ -635,6 +729,8 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Points",	FL_ALT+'q', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_POINTS},
   {"Scattered Lines",	FL_ALT+'m', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_LINES},
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
+  {"Blur",				FL_ALT+'b', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_BLUR},
+  {"Sharpen",			FL_ALT+'s', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SHARPEN},
   {0}
 };
 
@@ -685,6 +781,11 @@ ImpressionistUI::ImpressionistUI() {
 	m_nLineWidth = 1;
 	m_nLineAngle = 0;
 	m_dOpacity = 1.0;
+	m_nSpacing = 4;
+	m_nThreshold = 200;
+	m_bEdgeClipping = TRUE;
+	m_bAnotherGradient = FALSE;
+	m_bSizeRandom = FALSE;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -758,6 +859,57 @@ ImpressionistUI::ImpressionistUI() {
 		m_OpacitySlider->value(m_dOpacity);
 		m_OpacitySlider->align(FL_ALIGN_RIGHT);
 		m_OpacitySlider->callback(cb_opacitySlides);
+
+		// Add Edge Clipping light button
+		m_EdgeClippingButton = new Fl_Light_Button(10,210,150,25,"&Edge_Clipping");
+		m_EdgeClippingButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_EdgeClippingButton->callback(cb_edge_clipping_lbutton);
+		m_EdgeClippingButton->deactivate();
+
+		// Add Edge Clipping light button
+		m_AnotherGradientButton = new Fl_Light_Button(240,210,150,25,"&Another Gradient");
+		m_AnotherGradientButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_AnotherGradientButton->callback(cb_another_gradient_lbutton);
+		m_AnotherGradientButton->deactivate();
+
+		// Add spacing slider to the dialog 
+		m_SpacingSlider = new Fl_Value_Slider(10, 240, 120, 20, "&Spacing");
+		m_SpacingSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_SpacingSlider->type(FL_HOR_NICE_SLIDER);
+        m_SpacingSlider->labelfont(FL_COURIER);
+        m_SpacingSlider->labelsize(12);
+		m_SpacingSlider->minimum(1);
+		m_SpacingSlider->maximum(16);
+		m_SpacingSlider->step(1);
+		m_SpacingSlider->value(m_nSpacing);
+		m_SpacingSlider->align(FL_ALIGN_RIGHT);
+		m_SpacingSlider->callback(cb_spacing_slide);
+
+		// Add Size Random light button
+		m_SizeRandomButton = new Fl_Light_Button(210,240,100,25,"&Size Rand");
+		m_SizeRandomButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_SizeRandomButton->callback(cb_size_random_lbutton);
+
+		m_AutoPaintButton = new Fl_Button(320,240,70,25,"&Paint");
+		m_AutoPaintButton->user_data((void*)(this));
+		m_AutoPaintButton->callback(cb_auto_paint_button);
+
+		// Add spacing slider to the dialog 
+		m_ThresholdSlider = new Fl_Value_Slider(10, 270, 200, 20, "&Threshold");
+		m_ThresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_ThresholdSlider->type(FL_HOR_NICE_SLIDER);
+        m_ThresholdSlider->labelfont(FL_COURIER);
+        m_ThresholdSlider->labelsize(12);
+		m_ThresholdSlider->minimum(0);
+		m_ThresholdSlider->maximum(500);
+		m_ThresholdSlider->step(1);
+		m_ThresholdSlider->value(m_nThreshold);
+		m_ThresholdSlider->align(FL_ALIGN_RIGHT);
+		m_ThresholdSlider->callback(cb_threshold_slide);
+
+		m_ThresholdChangeButton = new Fl_Button(320,270,70,25,"&Set");
+		m_ThresholdChangeButton->user_data((void*)(this));
+		m_ThresholdChangeButton->callback(cb_threshold_change_button);
 
 
     m_brushDialog->end();	

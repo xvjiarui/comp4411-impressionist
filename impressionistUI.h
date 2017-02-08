@@ -42,7 +42,17 @@ public:
 	Fl_Slider*			m_BrushLineWidthSlider;
 	Fl_Slider*			m_BrushLineAngleSlider;
 	Fl_Slider* 			m_OpacitySlider;
+	Fl_Slider* 			m_SpacingSlider;
+	Fl_Slider* 			m_ThresholdSlider;
+
 	Fl_Button*          m_ClearCanvasButton;
+	Fl_Button* 			m_AutoPaintButton;
+	Fl_Button*			m_ThresholdChangeButton;
+
+	Fl_Light_Button* 	m_EdgeClippingButton;
+	Fl_Light_Button*	m_AnotherGradientButton;
+	Fl_Light_Button*	m_SizeRandomButton;
+
 
 	// Member functions
 	void				setDocument(ImpressionistDoc* doc);
@@ -56,6 +66,9 @@ public:
 	int					getSize();
 	int 				getLineWidth();
 	int 				getLineAngle();
+	int 				getThreshold();
+	int 				getSpacing();
+	bool 				getSizeRandom();
 	double				getOpacity();
 	double				getR();
 	double				getG();
@@ -73,7 +86,12 @@ private:
 	int		m_nSize;
 	int 	m_nLineWidth;
 	int 	m_nLineAngle;
+	int 	m_nSpacing;
+	int 	m_nThreshold;
 	double 	m_dOpacity;
+	bool 	m_bEdgeClipping;
+	bool	m_bAnotherGradient;
+	bool	m_bSizeRandom;
 	static double	m_nR;
 	static double	m_nG;
 	static double	m_nB;
@@ -112,6 +130,13 @@ private:
 	static void cb_lineWidthSlides(Fl_Widget* o, void* v);
 	static void cb_lineAngleSlides(Fl_Widget* o, void* v);
 	static void cb_opacitySlides(Fl_Widget* o, void* v);
+	static void cb_edge_clipping_lbutton(Fl_Widget* o, void* v);
+	static void cb_another_gradient_lbutton(Fl_Widget* o, void* v);
+	static void cb_size_random_lbutton(Fl_Widget* o, void* v);
+	static void cb_auto_paint_button(Fl_Widget* o, void* v);
+	static void cb_threshold_change_button(Fl_Widget* o, void* v);
+	static void cb_spacing_slide(Fl_Widget* o, void* v);
+	static void cb_threshold_slide(Fl_Widget * o, void* v);
 
 
 };

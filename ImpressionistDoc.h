@@ -24,7 +24,7 @@ public:
 	int		saveImage(char *iname);			// called by the UI to save image
 	int		dissolveImage(char *iname);			// called by the UI to dissolve image
 	int		loadAnotherImage(char *iname);			// called by the UI to load another image
-
+	void 	generateRGB();
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	void	setBrushType(int type);			// called by the UI to set the brushType
@@ -46,6 +46,8 @@ public:
 	void 	saveTemp();
 	void 	undo();
 	void 	swapViews();
+
+	int 	changeThreshold();
 	
 
 
@@ -64,6 +66,9 @@ public:
 	unsigned char*	m_ucEdgeBitmap;
 	unsigned char*	m_ucPainting;
 	unsigned char* 	m_ucPrePainting;
+	unsigned char* 	m_ucBitmapR;
+	unsigned char* 	m_ucBitmapG;
+	unsigned char* 	m_ucBitmapB;
 	int* 			m_nGradientxy;
 	int* 			m_nGradientValue;
 

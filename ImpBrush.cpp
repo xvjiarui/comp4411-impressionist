@@ -8,6 +8,7 @@
 #include "impressionistUI.h"
 #include "ImpBrush.h"
 
+
 // Static class member initializations
 int			ImpBrush::c_nBrushCount	= 0;
 ImpBrush**	ImpBrush::c_pBrushes	= NULL;
@@ -57,3 +58,6 @@ void ImpBrush::SetColor (const Point source)
 	glColor4ubv( color );
 
 }
+
+
+

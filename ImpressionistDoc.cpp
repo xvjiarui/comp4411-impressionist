@@ -20,6 +20,8 @@
 #include "ScatteredPointBrush.h"
 #include "ScatteredLineBrush.h"
 #include "ScatteredCircleBrush.h"
+#include "BlurBrush.h"
+#include "SharpenBrush.h"
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -32,6 +34,9 @@ ImpressionistDoc::ImpressionistDoc()
 
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
+	m_ucBitmapR 	= NULL;
+	m_ucBitmapG 	= NULL;
+	m_ucBitmapB 	= NULL;
 	m_ucAnotherBitmap = NULL;
 	m_ucEdgeBitmap = NULL;
 	m_ucDissolveBitmap = NULL;
@@ -58,6 +63,10 @@ ImpressionistDoc::ImpressionistDoc()
 		= new ScatteredLineBrush( this, "Scattered Lines" );
 	ImpBrush::c_pBrushes[BRUSH_SCATTERED_CIRCLES]	
 		= new ScatteredCircleBrush( this, "Scattered Circles" );
+	ImpBrush::c_pBrushes[BRUSH_BLUR]				
+		= new BlurBrush( this, "Blur" );
+	ImpBrush::c_pBrushes[BRUSH_SHARPEN]				
+		= new SharpenBrush( this, "Sharpen" );
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
@@ -119,12 +128,21 @@ void ImpressionistDoc::setBrushType(int type)
 		m_pUI->m_BrushLineWidthSlider->activate();
 		m_pUI->m_BrushLineAngleSlider->activate();
 		m_pUI->m_BrushDirectionChoice->activate();
+		m_pUI->m_EdgeClippingButton->activate();
+		m_pUI->m_AnotherGradientButton->activate();
 	}
 	else {
 		m_pUI->m_BrushLineWidthSlider->deactivate();
 		m_pUI->m_BrushLineAngleSlider->deactivate();
 		m_pUI->m_BrushDirectionChoice->deactivate();
+		m_pUI->m_EdgeClippingButton->deactivate();
+		m_pUI->m_AnotherGradientButton->deactivate();
 	}
+	if (type == BRUSH_BLUR || type == BRUSH_SHARPEN)
+	{
+		m_pUI->m_BrushSizeSlider->deactivate();
+	}
+	else m_pUI->m_BrushSizeSlider->activate();
 }
 
 //---------------------------------------------------------
@@ -243,9 +261,11 @@ int ImpressionistDoc::loadImage(char *iname)
 	if ( m_ucBitmap ) delete [] m_ucBitmap;
 	if ( m_ucPainting ) delete [] m_ucPainting;
 	if ( m_ucEdgeBitmap) delete[] m_ucEdgeBitmap;
+	if ( m_nGradientxy)	delete[] m_nGradientxy;
+	if ( m_nGradientValue) delete[] m_nGradientValue;
 
 	m_ucBitmap		= data;
-
+	generateRGB();
 	// allocate space for draw view
 	m_ucPainting	= new unsigned char [width*height*3];
 	memset(m_ucPainting, 0, width*height*3);
@@ -262,7 +282,53 @@ int ImpressionistDoc::loadImage(char *iname)
 
 	// allocate space for edge view
 	m_ucEdgeBitmap = new GLubyte[3*width*height];
-	calculateEdgeMap();
+	calculateEdgeMap(m_pUI->getThreshold());
+
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(width, height);	
+	m_pUI->m_origView->refresh();
+
+	// refresh paint view as well
+	m_pUI->m_paintView->resizeWindow(width, height);	
+	m_pUI->m_paintView->refresh();
+
+
+	return 1;
+}
+
+void ImpressionistDoc:: generateRGB(){
+	if (m_ucBitmapR) delete[] m_ucBitmapR;
+	if (m_ucBitmapG) delete[] m_ucBitmapG;
+	if (m_ucBitmapB) delete[] m_ucBitmapB;
+	m_ucBitmapR = new GLubyte [m_nWidth * m_nHeight];
+	m_ucBitmapG = new GLubyte [m_nWidth * m_nHeight];
+	m_ucBitmapB = new GLubyte [m_nWidth * m_nHeight];
+	for (int i = 0; i < m_nWidth; ++i)
+	{
+		for (int j = 0; j < m_nHeight; ++j)
+		{
+			m_ucBitmapR[j * m_nWidth +i] = m_ucBitmap[3 * (j * m_nWidth + i)];
+			m_ucBitmapG[j * m_nWidth +i] = m_ucBitmap[3 * (j * m_nWidth + i)+1];
+			m_ucBitmapB[j * m_nWidth +i] = m_ucBitmap[3 * (j * m_nWidth + i)+2];
+		}
+	}
+}
+
+//---------------------------------------------------------
+// Change threshold
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::changeThreshold() 
+{
+	int width = m_nWidth;
+	int height = m_nHeight;
+	// release old storage
+	if ( m_ucEdgeBitmap) delete[] m_ucEdgeBitmap;
+
+	// allocate space for edge view
+	m_ucEdgeBitmap = new GLubyte[3*width*height];
+	calculateEdgeMap(m_pUI->getThreshold());
 
 	// display it on origView
 	m_pUI->m_origView->resizeWindow(width, height);	

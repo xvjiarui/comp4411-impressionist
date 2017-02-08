@@ -3,7 +3,8 @@
 //
 // The code maintaining the painting view of the input images
 //
-
+#include <algorithm>
+#include <vector>;
 #include "impressionist.h"
 #include "impressionistDoc.h"
 #include "impressionistUI.h"
@@ -17,6 +18,7 @@
 #define RIGHT_MOUSE_DOWN	4
 #define RIGHT_MOUSE_DRAG	5
 #define RIGHT_MOUSE_UP		6
+#define AUTO_PAINT			7
 
 
 #ifndef WIN32
@@ -109,6 +111,8 @@ void PaintView::draw()
 		{
 		case LEFT_MOUSE_DOWN:
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
+			// printf("s x:%d y:%d\n",source.x,source.y );
+			// printf("t x:%d y:%d\n",target.x,target.y );
 			break;
 		case LEFT_MOUSE_DRAG:
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
@@ -142,6 +146,11 @@ void PaintView::draw()
 				m_pDoc->setLineAngle(m_pDoc->rightMouseAngle());
 				m_pDoc->setSize(m_pDoc->rightMouseSize());
 			}
+			RestoreContent();
+			break;
+		case AUTO_PAINT:
+			autoPaint();
+			SaveCurrentContent();
 			RestoreContent();
 			break;
 
@@ -219,16 +228,70 @@ void PaintView::refresh()
 	redraw();
 }
 
+void PaintView::autoPaint(){
+	if ( m_pDoc->m_ucPainting) 
+	{
+		int spacing = m_pDoc->m_pUI->getSpacing();
+		// int temp_size = m_pDoc->getSize();
+		int width = m_pDoc->m_nWidth;
+		int height = m_pDoc->m_nHeight;
+		// printf("w%d\n", width);
+		// printf("h%d\n", height);
+		// printf("spacing:%d\n", spacing);
+		m_pDoc->saveTemp();
+		if (m_pDoc->m_pUI->getSizeRandom())
+		{
+			std::vector<Point> order;
+			int range = (int)((m_pDoc->m_pUI->getSize()));
+			for (int j = 0; j < m_pDoc->m_nHeight; j += spacing)
+			{
+				for (int i = 0; i < m_pDoc->m_nWidth; i += spacing)
+				{
+					int randomPosx = rand() % range - range / 2;
+					int randomPosy = rand() % range - range / 2;
+					Point p(i+randomPosx, j+randomPosy);
+					order.push_back(p);
+				}
+			}
+			std::random_shuffle(order.begin(), order.end());
+
+			for (int i = 0; i < order.size(); ++i)
+			{
+				m_pDoc->m_pCurrentBrush->BrushBegin(order[i],order[i]);
+				m_pDoc->m_pCurrentBrush->BrushEnd(order[i],order[i]);
+			}
+		}
+		else {
+			for (int i = 0; i < width; i+=spacing)
+			{
+				for (int j = 0; j < height; j+=spacing)
+				{	
+					m_pDoc->m_pCurrentBrush->BrushBegin( Point(i,j), Point(i,j) );
+					m_pDoc->m_pCurrentBrush->BrushEnd( Point(i,j), Point(i,j));
+				}
+			}
+		}	
+		// m_pDoc->setSize(temp_size);	
+	}
+}
+
 void PaintView::resizeWindow(int width, int height)
 {
 	resize(x(), y(), width, height);
+}
+
+void PaintView::triggerAutoPaint()
+{
+	isAnEvent = 1;
+	eventToDo = AUTO_PAINT;
+	redraw();
 }
 
 void PaintView::SaveCurrentContent()
 {
 	// Tell openGL to read from the front buffer when capturing
 	// out paint strokes
-	glReadBuffer(GL_FRONT);
+	glReadBuffer(GL_FRONT_AND_BACK);
 
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_PACK_ROW_LENGTH, m_pDoc->m_nPaintWidth );
