@@ -212,6 +212,31 @@ void ImpressionistUI::cb_brushes(Fl_Menu_* o, void* v)
 }
 
 //-------------------------------------------------------------
+// Brings up the dimmed dialog
+// This is called by the UI when the brushes menu item
+// is chosen
+//-------------------------------------------------------------
+void ImpressionistUI::cb_dimmed_view(Fl_Menu_* o, void* v) 
+{
+	// printf("show\n");
+	// ImpressionistDoc *pDoc=whoami(o)->getDocument();
+	whoami(o)->m_dimmedDialog->show();
+}
+
+// void ImpressionistUI::cb_restore_painting(Fl_Widget* o, void* v)
+// {
+// 	printf("callback\n");
+// 	ImpressionistUI* pUI=((ImpressionistUI *)(o->user_data()));
+// 	ImpressionistDoc* pDoc=pUI->getDocument();
+// 	pDoc->m_ucPainting=pDoc->m_ucDisplayBitmap;
+// 	if (pDoc->m_ucDisplayBitmap)
+// 	{
+// 		delete []  pDoc->m_ucDisplayBitmap;
+// 	}
+// 	pDoc->m_ucDisplayBitmap = NULL;
+// }
+
+//-------------------------------------------------------------
 // Brings up the filter dialog
 // This is called by the UI when the brushes menu item
 // is chosen
@@ -490,6 +515,18 @@ void ImpressionistUI::cb_threshold_slide(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_nThreshold=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+//-----------------------------------------------------------
+// Updates the dimmed value to use from the value of the size
+// slider
+// Called by the UI when the size slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_dimmed_value_slide(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_dDimmedValue=double( ((Fl_Slider *)o)->value() ) ;
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+	pDoc->changeDimmedValue();
+}
+
 void ImpressionistUI::cb_edge_clipping_lbutton(Fl_Widget* o, void* v)
 {
 	ImpressionistUI* pUI=((ImpressionistUI*)(o->user_data()));
@@ -691,6 +728,14 @@ double ImpressionistUI::getOpacity()
 }
 
 //------------------------------------------------
+// Return the dimmed
+//------------------------------------------------
+double ImpressionistUI::getDimmedValue()
+{
+	return m_dDimmedValue;
+}
+
+//------------------------------------------------
 // Return the R
 //------------------------------------------------
 double ImpressionistUI::getR()
@@ -844,6 +889,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&User Edge Image",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_user_edge_image },
 		{ "&Another Image",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_another_image }, 
 		{ "&Swap views", FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_swap_views},
+		{ "&Dimmed view", FL_ALT + 'd', (Fl_Callback *)ImpressionistUI::cb_dimmed_view},
 		{ 0 },
 
 	{ "&Options",		0, 0, 0, FL_SUBMENU },
@@ -919,6 +965,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nLineWidth = 1;
 	m_nLineAngle = 0;
 	m_dOpacity = 1.0;
+	m_dDimmedValue = 0.0;
 	m_nSpacing = 4;
 	m_nThreshold = 200;
 	m_bEdgeClipping = FALSE;
@@ -1068,4 +1115,24 @@ ImpressionistUI::ImpressionistUI() {
 			m_filterSizeSubmitButton->callback(cb_filter_size_submit);
 
 	m_filterSizeDialog->end();
+
+
+	m_dimmedDialog = new Fl_Window(300,100, "Dimmed Value");
+
+		// / Add dimmed value slider to the dialog 
+		m_DimmedValueSlider = new Fl_Value_Slider(10, 20, 150, 20, "&Dimmed value");
+		m_DimmedValueSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_DimmedValueSlider->type(FL_HOR_NICE_SLIDER);
+        m_DimmedValueSlider->labelfont(FL_COURIER);
+        m_DimmedValueSlider->labelsize(12);
+		m_DimmedValueSlider->minimum(0);
+		m_DimmedValueSlider->maximum(1);
+		m_DimmedValueSlider->step(0.01);
+		m_DimmedValueSlider->value(m_dDimmedValue);
+		m_DimmedValueSlider->align(FL_ALIGN_RIGHT);
+		m_DimmedValueSlider->callback(cb_dimmed_value_slide);
+
+	m_dimmedDialog->end();
+	// m_dimmedDialog->callback(cb_restore_painting);
+
 }

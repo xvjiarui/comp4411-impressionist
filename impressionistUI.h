@@ -40,6 +40,7 @@ public:
 	Fl_Window*			m_brushDialog;
 	Fl_Window* 			m_filterSizeDialog;
 	Fl_Window* 			m_filterInputDialog;
+	Fl_Window*			m_dimmedDialog;
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_BrushDirectionChoice;
 
@@ -52,6 +53,7 @@ public:
 	Fl_Slider* 			m_OpacitySlider;
 	Fl_Slider* 			m_SpacingSlider;
 	Fl_Slider* 			m_ThresholdSlider;
+	Fl_Slider*			m_DimmedValueSlider;
 
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button* 			m_AutoPaintButton;
@@ -86,6 +88,7 @@ public:
 	bool 				getEdgeClipping();
 	bool 				getNormalize();
 	double				getOpacity();
+	double 				getDimmedValue();
 	double				getR();
 	double				getG();
 	double				getB();
@@ -115,6 +118,7 @@ private:
 	bool	m_bAnotherGradient;
 	bool	m_bSizeRandom;
 	bool 	m_bNormalize;
+	double m_dDimmedValue;
 	static double	m_nR;
 	static double	m_nG;
 	static double	m_nB;
@@ -143,6 +147,7 @@ private:
 	static void cb_original_image(Fl_Menu_* o, void* v);
 	static void cb_edge_image(Fl_Menu_* o, void* v);
 	static void cb_another_image(Fl_Menu_* o, void* v);
+	static void cb_dimmed_view(Fl_Menu_* o, void* v);
 	static void cb_swap_views(Fl_Menu_* o, void* v);
 	static void cb_faster(Fl_Menu_* o, void* v);
 	static void cb_safer(Fl_Menu_* o, void* v);
@@ -155,6 +160,7 @@ private:
 	static void cb_lineWidthSlides(Fl_Widget* o, void* v);
 	static void cb_lineAngleSlides(Fl_Widget* o, void* v);
 	static void cb_opacitySlides(Fl_Widget* o, void* v);
+	static void cb_dimmed_value_slide(Fl_Widget* o, void* v);
 	static void cb_edge_clipping_lbutton(Fl_Widget* o, void* v);
 	static void cb_another_gradient_lbutton(Fl_Widget* o, void* v);
 	static void cb_size_random_lbutton(Fl_Widget* o, void* v);
@@ -165,6 +171,7 @@ private:
 	static void cb_filter_size_submit(Fl_Widget* o, void* v);
 	static void cb_filter_input_apply(Fl_Widget* o, void* v);
 	static void cb_filter_input_normalize_lbutton(Fl_Widget* o, void* v);
+	static void cb_restore_painting(Fl_Widget* o, void* v);
 
 
 };

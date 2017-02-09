@@ -42,6 +42,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucUserEdgeBitmap = NULL;
 	m_ucDissolveBitmap = NULL;
 	m_ucPainting	= NULL;
+	m_ucDisplayBitmap = NULL;
 	m_ucPrePainting = NULL;
 
 	m_nGradientxy = NULL;
@@ -275,12 +276,18 @@ int ImpressionistDoc::loadImage(char *iname)
 	if ( m_ucEdgeBitmap) delete[] m_ucEdgeBitmap;
 	if ( m_nGradientxy)	delete[] m_nGradientxy;
 	if ( m_nGradientValue) delete[] m_nGradientValue;
+	if ( m_ucDisplayBitmap) delete[] m_ucDisplayBitmap;
+	{
+		/* code */
+	}
 
 	m_ucBitmap		= data;
 	generateRGB();
 	// allocate space for draw view
 	m_ucPainting	= new unsigned char [width*height*3];
 	memset(m_ucPainting, 0, width*height*3);
+	m_ucDisplayBitmap	= new unsigned char [width*height*3];
+	memset(m_ucDisplayBitmap, 0, width*height*3);
 
 	m_pUI->m_mainWindow->resize(m_pUI->m_mainWindow->x(), 
 								m_pUI->m_mainWindow->y(), 
@@ -535,13 +542,24 @@ void ImpressionistDoc::swapViews(){
 	m_pUI->m_paintView->refresh();
 }
 
-void ImpressionistDoc::saveTemp(){
+void ImpressionistDoc::saveTemp()
+{
 	int width, height;
 	width = m_nWidth;
 	height = m_nHeight;
 	if ( m_ucPrePainting ) delete [] m_ucPrePainting;
 	m_ucPrePainting	= new unsigned char [width*height*3];
 	memcpy ( m_ucPrePainting, m_ucPainting, width*height*3 );
+}
+
+void ImpressionistDoc::saveDim()
+{
+	int width, height;
+	width = m_nWidth;
+	height = m_nHeight;
+	if ( m_ucDisplayBitmap ) delete [] m_ucDisplayBitmap;
+	m_ucDisplayBitmap	= new unsigned char [width*height*3];
+	memcpy ( m_ucDisplayBitmap, m_ucPainting, width*height*3 );
 }
 
 void ImpressionistDoc::undo(){
@@ -751,3 +769,27 @@ void ImpressionistDoc:: applyUserFilter(){
 	m_pUI->m_paintView->refresh();
 }
 
+void ImpressionistDoc:: changeDimmedValue(){
+	double dimmedValue = m_pUI->getDimmedValue();
+	for (int i = 0; i < 3* m_nWidth * m_nHeight; ++i)
+	{
+		// m_ucPainting[i] = dimmedValue * m_ucBitmap[i] + (1 - dimmedValue) * m_ucDisplayBitmap[i];
+		m_ucDisplayBitmap[i] = dimmedValue * m_ucBitmap[i] + (1 - dimmedValue) * m_ucPainting[i];
+	}
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(m_nWidth, m_nHeight);	
+	m_pUI->m_origView->refresh();
+	// refresh paint view as well
+	// Dimme abort
+	// swap(m_ucPainting, m_ucDisplayBitmap);
+	m_pUI->m_paintView->resizeWindow(m_nWidth, m_nHeight);	
+	m_pUI->m_paintView->refresh();
+	// swap(m_ucPainting, m_ucDisplayBitmap);
+}
+
+void ImpressionistDoc::swap(GLubyte* &a, GLubyte* &b)
+{
+	GLubyte* temp = a;
+	a = b;
+	b =a;
+}

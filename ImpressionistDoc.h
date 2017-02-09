@@ -45,13 +45,15 @@ public:
 	int 	rightMouseAngle();
 	int 	rightMouseSize();
 	void 	saveTemp();
+	void 	saveDim();
 	void 	undo();
 	void 	swapViews();
 
 	int 	changeThreshold();
 
 	void 	applyUserFilter();
-	
+	void 	changeDimmedValue();
+	void 	swap(GLubyte* &a, GLubyte* &b);
 
 
 // Attributes
@@ -69,6 +71,7 @@ public:
 	unsigned char*	m_ucEdgeBitmap;
 	unsigned char* 	m_ucUserEdgeBitmap;
 	unsigned char*	m_ucPainting;
+	unsigned char* 	m_ucDisplayBitmap;
 	unsigned char* 	m_ucPrePainting;
 	unsigned char* 	m_ucBitmapR;
 	unsigned char* 	m_ucBitmapG;
