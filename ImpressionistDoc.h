@@ -24,6 +24,7 @@ public:
 	int		saveImage(char *iname);			// called by the UI to save image
 	int		dissolveImage(char *iname);			// called by the UI to dissolve image
 	int		loadAnotherImage(char *iname);			// called by the UI to load another image
+	int 	loadEdgeImage(char *iname);
 	void 	generateRGB();
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
@@ -64,6 +65,7 @@ public:
 	unsigned char*	m_ucAnotherBitmap;
 	unsigned char* 	m_ucDissolveBitmap;
 	unsigned char*	m_ucEdgeBitmap;
+	unsigned char* 	m_ucUserEdgeBitmap;
 	unsigned char*	m_ucPainting;
 	unsigned char* 	m_ucPrePainting;
 	unsigned char* 	m_ucBitmapR;
@@ -71,6 +73,8 @@ public:
 	unsigned char* 	m_ucBitmapB;
 	int* 			m_nGradientxy;
 	int* 			m_nGradientValue;
+	int* 			m_nAnotherGradientxy;
+	int* 			m_nAnotherGradientValue;
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
@@ -101,6 +105,13 @@ public:
 	GLubyte* GetOriginalPixel( int x, int y );   
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetOriginalPixel( const Point p );  
+
+
+	// Get the color of the another picture at the specified coord
+	GLubyte* GetAnotherPixel( int x, int y );   
+	// Get the color of the another picture at the specified point	
+	GLubyte* GetAnotherPixel( const Point p );  
+
 	// calculate gradient
 	void calculateGradient(unsigned char* source, int* gradientxy, int* value );
 	// Calculate edge image

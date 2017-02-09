@@ -66,19 +66,35 @@ void ScatteredLineBrush::BrushMove( const Point source, const Point target )
 					case 1: 
 						double Gx;
 						double Gy;
-						GLubyte color[3][3][3];
-						double intensity[3][3];
-						for (int p = -1; p < 2; p++){
-							for (int q = -1; q < 2; q++){
-								memcpy(color[p+1][q+1], pDoc->GetOriginalPixel(Point(source.x - size/2 + i + p, source.y - size/2 + j + q)), 3);
-								intensity[p + 1][q + 1] = 0.299*color[p + 1][q + 1][0] + 0.587*color[p + 1][q + 1][1] + 0.144*color[p + 1][q + 1][2];
-							}
+						// GLubyte color[3][3][3];
+						// double intensity[3][3];
+						// for (int p = -1; p < 2; p++){
+						// 	for (int q = -1; q < 2; q++){
+						// 		memcpy(color[p+1][q+1], pDoc->GetOriginalPixel(Point(source.x - size/2 + i + p, source.y - size/2 + j + q)), 3);
+						// 		intensity[p + 1][q + 1] = 0.299*color[p + 1][q + 1][0] + 0.587*color[p + 1][q + 1][1] + 0.144*color[p + 1][q + 1][2];
+						// 	}
+						// }
+						// Gx = intensity[0][0] * (-1) + intensity[0][1] * (-2) + intensity[0][2] * (-1)\
+						// 		  + intensity[2][0] * (1) + intensity[2][1] * (2) + intensity[2][2] * (1);
+						// Gy = intensity[0][0] * (-1) + intensity[1][0] * (-2) + intensity[2][0] * (-1)\
+						// 	+ intensity[0][2] * (1) + intensity[1][2] * (2) + intensity[2][2] * (1);
+						// angle = -(int)(atan2(Gy, Gx)*180/Pi) % 360;
+
+						if(pDoc->m_pUI->getAnotherGradient() && pDoc->m_ucAnotherBitmap) 
+						{
+							Gx = pDoc->m_nAnotherGradientxy[2*((source.y - size/2 +j)* pDoc->m_nWidth + source.x - size/2 + i)];
+							Gy = pDoc->m_nAnotherGradientxy[2*((source.y - size/2 +j)* pDoc->m_nWidth + source.x - size/2 + i)+1];
 						}
-						Gx = intensity[0][0] * (-1) + intensity[0][1] * (-2) + intensity[0][2] * (-1)\
-								  + intensity[2][0] * (1) + intensity[2][1] * (2) + intensity[2][2] * (1);
-						Gy = intensity[0][0] * (-1) + intensity[1][0] * (-2) + intensity[2][0] * (-1)\
-							+ intensity[0][2] * (1) + intensity[1][2] * (2) + intensity[2][2] * (1);
-						angle = -(int)(atan2(Gy, Gx)*180/Pi) % 360;
+						else
+						{
+							Gx = pDoc->m_nGradientxy[2*((source.y - size/2 +j)* pDoc->m_nWidth + source.x - size/2 + i)];
+							Gy = pDoc->m_nGradientxy[2*((source.y - size/2 +j)* pDoc->m_nWidth + source.x - size/2 + i)+1];
+						}
+						angle = (int)(atan2(Gy, Gx)*180/Pi + 90);
+						if (angle < 0)
+						{
+							angle += 360;
+						}
 						break;
 
 					case 2:

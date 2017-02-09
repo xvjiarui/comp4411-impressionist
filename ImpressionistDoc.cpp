@@ -39,12 +39,15 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucBitmapB 	= NULL;
 	m_ucAnotherBitmap = NULL;
 	m_ucEdgeBitmap = NULL;
+	m_ucUserEdgeBitmap = NULL;
 	m_ucDissolveBitmap = NULL;
 	m_ucPainting	= NULL;
 	m_ucPrePainting = NULL;
 
 	m_nGradientxy = NULL;
 	m_nGradientValue = NULL;
+	m_nAnotherGradientxy = NULL;
+	m_nAnotherGradientValue = NULL;
 
 	// create one instance of each brush
 	ImpBrush::c_nBrushCount	= NUM_BRUSH_TYPE;
@@ -129,7 +132,6 @@ void ImpressionistDoc::setBrushType(int type)
 		m_pUI->m_BrushLineAngleSlider->activate();
 		m_pUI->m_BrushDirectionChoice->activate();
 		m_pUI->m_EdgeClippingButton->activate();
-		m_pUI->m_AnotherGradientButton->activate();
 	}
 	else {
 		m_pUI->m_BrushLineWidthSlider->deactivate();
@@ -155,8 +157,18 @@ void ImpressionistDoc::setBrushDirection(int type)
 	if (type == DIRECTION_SLIDER)
 	{
 		m_pUI->m_BrushLineAngleSlider->activate();
+		
 	}
-	else m_pUI->m_BrushLineAngleSlider->deactivate();
+	else if (type == DIRECTION_GRADIENT)
+	{
+		m_pUI->m_AnotherGradientButton->activate();
+	}
+	else 
+	{	
+		m_pUI->m_BrushLineAngleSlider->deactivate();
+		m_pUI->m_AnotherGradientButton->deactivate();
+	}
+
 }
 void ImpressionistDoc:: setSize(int size){
 	m_pUI->setSize(size);
@@ -357,10 +369,11 @@ int ImpressionistDoc::dissolveImage(char *iname)
 	if ( (data=readBMP(iname, width, height))==NULL ) 
 	{
 		fl_alert("Can't load bitmap file");
-		if (width != m_nWidth || height != m_nHeight)
-		{
-			fl_alert("Diffent size");
-		}
+		return 0;
+	}
+	if (width != m_nWidth || height != m_nHeight)
+	{
+		fl_alert("Diffent size");
 		return 0;
 	}
 
@@ -389,6 +402,49 @@ int ImpressionistDoc::dissolveImage(char *iname)
 	return 1;
 }
 
+// Load edge Image
+int ImpressionistDoc::loadEdgeImage(char *iname) 
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width, 
+					height;
+
+	if ( (data=readBMP(iname, width, height))==NULL ) 
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (width != m_nWidth || height != m_nHeight)
+	{
+		fl_alert("Diffent size");
+		return 0;
+	}
+
+	// reflect the fact of loading the new image
+	m_nWidth		= width;
+	m_nPaintWidth	= width;
+	m_nHeight		= height;
+	m_nPaintHeight	= height;
+
+	// release old storage
+	if ( m_ucUserEdgeBitmap) delete[] m_ucUserEdgeBitmap;
+
+	m_ucUserEdgeBitmap		= data;
+
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(width, height);	
+	m_pUI->m_origView->refresh();
+
+	// refresh paint view as well
+	m_pUI->m_paintView->resizeWindow(width, height);	
+	m_pUI->m_paintView->refresh();
+
+
+	return 1;
+}
+
 //---------------------------------------------------------
 // Load the another image
 // This is called by the UI when the load image button is 
@@ -405,12 +461,17 @@ int ImpressionistDoc::loadAnotherImage(char *iname)
 	if ( (data=readBMP(iname, width, height))==NULL ) 
 	{
 		fl_alert("Can't load bitmap file");
-		if (width != m_nWidth || height != m_nHeight)
-		{
-			fl_alert("Diffent size");
-		}
 		return 0;
 	}
+
+	if (width != m_nWidth || height != m_nHeight)
+	{
+		fl_alert("Diffent size");
+		return 0;
+	}
+
+	if ( m_nAnotherGradientxy) delete[] m_nAnotherGradientxy;
+	if ( m_nAnotherGradientValue) delete[] m_nAnotherGradientValue;
 
 	// reflect the fact of loading the new image
 	m_nWidth		= width;
@@ -421,6 +482,11 @@ int ImpressionistDoc::loadAnotherImage(char *iname)
 	// release old storage
 
 	m_ucAnotherBitmap = data;
+
+	// Calculate Gradient
+	m_nAnotherGradientxy = new int [2 * width * height];
+	m_nAnotherGradientValue = new int [width * height];
+	calculateGradient(m_ucAnotherBitmap, m_nAnotherGradientxy, m_nAnotherGradientValue);
 
 	// display it on origView
 	m_pUI->m_origView->resizeWindow(width, height);	
@@ -554,6 +620,29 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( int x, int y )
 GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
+}
+
+GLubyte* ImpressionistDoc::GetAnotherPixel( int x, int y )
+{
+	if ( x < 0 ) 
+		x = 0;
+	else if ( x >= m_nWidth ) 
+		x = m_nWidth-1;
+
+	if ( y < 0 ) 
+		y = 0;
+	else if ( y >= m_nHeight ) 
+		y = m_nHeight-1;
+
+	return (GLubyte*)(m_ucAnotherBitmap + 3 * (y*m_nWidth + x));
+}
+
+//----------------------------------------------------------------
+// Get the color of the pixel in the original image at point p
+//----------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetAnotherPixel( const Point p )
+{
+	return GetAnotherPixel( p.x, p.y );
 }
 
 void ImpressionistDoc::calculateGradient(unsigned char* source, int* gradientxy, int* value ){

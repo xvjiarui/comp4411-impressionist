@@ -69,6 +69,8 @@ public:
 	int 				getThreshold();
 	int 				getSpacing();
 	bool 				getSizeRandom();
+	bool 				getAnotherGradient();
+	bool 				getEdgeClipping();
 	double				getOpacity();
 	double				getR();
 	double				getG();
@@ -113,6 +115,7 @@ private:
 	static void cb_paintly(Fl_Menu_* o, void* v);
 	static void cb_load_dissolve_image(Fl_Menu_* o, void* v);
 	static void cb_load_edge_image(Fl_Menu_* o, void* v);
+	static void cb_user_edge_image(Fl_Menu_* o, void* v);
 	static void cb_load_another_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void cb_original_image(Fl_Menu_* o, void* v);

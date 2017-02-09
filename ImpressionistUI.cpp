@@ -258,7 +258,12 @@ void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v)
 //------------------------------------------------------------
 
 void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v){
-	fl_message("Load Edge Image todo");
+	ImpressionistDoc *pDoc=whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Load Edge File?", "*.bmp", pDoc->getImageName() );
+	if (newfile != NULL) {
+		pDoc->loadEdgeImage(newfile);
+	}
 }
 
 //------------------------------------------------------------
@@ -305,6 +310,17 @@ void ImpressionistUI::cb_edge_image(Fl_Menu_* o, void* v)
 {
 	ImpressionistDoc* pDoc=whoami(o)->getDocument();
 	pDoc->m_pUI->m_origView->imageIndex = 1;
+	pDoc->m_pUI->m_origView->refresh();
+}
+
+//------------------------------------------------------------
+// Causes the Impressionist program to exit
+// Called by the UI when the edge_image menu item is chosen
+//------------------------------------------------------------
+void ImpressionistUI::cb_user_edge_image(Fl_Menu_* o, void* v) 
+{
+	ImpressionistDoc* pDoc=whoami(o)->getDocument();
+	pDoc->m_pUI->m_origView->imageIndex = 3;
 	pDoc->m_pUI->m_origView->refresh();
 }
 
@@ -463,18 +479,44 @@ void ImpressionistUI::cb_threshold_slide(Fl_Widget* o, void* v)
 
 void ImpressionistUI::cb_edge_clipping_lbutton(Fl_Widget* o, void* v)
 {
-	ImpressionistUI *pUI=((ImpressionistUI*)(o->user_data()));
-
-	if (pUI->m_bEdgeClipping==TRUE) pUI->m_bEdgeClipping=FALSE;
-	else pUI->m_bEdgeClipping=TRUE;
+	ImpressionistUI* pUI=((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+	if (pDoc->m_ucUserEdgeBitmap)
+	{
+		if (pUI->m_bEdgeClipping==TRUE)
+		{
+			pUI->m_bEdgeClipping=FALSE;
+			pUI->m_EdgeClippingButton->value(0);
+		} 
+		else {
+			pUI->m_bEdgeClipping=TRUE;
+			pUI->m_EdgeClippingButton->value(1);
+		}
+	}
+	else pUI->m_EdgeClippingButton->value(0);
+	
 }
 
 void ImpressionistUI::cb_another_gradient_lbutton(Fl_Widget* o, void* v)
 {
 	ImpressionistUI *pUI=((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+	if (pDoc->m_ucAnotherBitmap)
+	{	
 
-	if (pUI->m_bAnotherGradient==TRUE) pUI->m_bAnotherGradient=FALSE;
-	else pUI->m_bAnotherGradient=TRUE;
+		if (pUI->m_bAnotherGradient==TRUE) 
+		{
+			pUI->m_bAnotherGradient=FALSE;
+			pUI->m_AnotherGradientButton->value(0);
+		}
+		else 
+		{
+			pUI->m_bAnotherGradient=TRUE;
+			pUI->m_AnotherGradientButton->value(1);
+		}
+	}
+	else pUI->m_AnotherGradientButton->value(0);
+	
 }
 
 void ImpressionistUI::cb_size_random_lbutton(Fl_Widget* o, void* v)
@@ -632,6 +674,22 @@ bool ImpressionistUI::getSizeRandom()
 }
 
 //------------------------------------------------
+// Return the another gradient
+//------------------------------------------------
+bool ImpressionistUI::getAnotherGradient()
+{
+	return m_bAnotherGradient;
+}
+
+//------------------------------------------------
+// Return the edge clipping
+//------------------------------------------------
+bool ImpressionistUI::getEdgeClipping()
+{
+	return m_bEdgeClipping;
+}
+
+//------------------------------------------------
 // Reset RGB default 1 1 1
 //------------------------------------------------
 void ImpressionistUI::resetRGB(double r, double g, double b)
@@ -704,6 +762,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&Display",		0, 0, 0, FL_SUBMENU },
 		{ "&Original Image",	FL_ALT + 'o', (Fl_Callback *)ImpressionistUI::cb_original_image },
 		{ "&Edge Image",	FL_ALT + 'e', (Fl_Callback *)ImpressionistUI::cb_edge_image },
+		{ "&User Edge Image",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_user_edge_image },
 		{ "&Another Image",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_another_image }, 
 		{ "&Swap views", FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_swap_views},
 		{ 0 },
@@ -783,7 +842,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_dOpacity = 1.0;
 	m_nSpacing = 4;
 	m_nThreshold = 200;
-	m_bEdgeClipping = TRUE;
+	m_bEdgeClipping = FALSE;
 	m_bAnotherGradient = FALSE;
 	m_bSizeRandom = FALSE;
 
@@ -864,7 +923,6 @@ ImpressionistUI::ImpressionistUI() {
 		m_EdgeClippingButton = new Fl_Light_Button(10,210,150,25,"&Edge_Clipping");
 		m_EdgeClippingButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_EdgeClippingButton->callback(cb_edge_clipping_lbutton);
-		m_EdgeClippingButton->deactivate();
 
 		// Add Edge Clipping light button
 		m_AnotherGradientButton = new Fl_Light_Button(240,210,150,25,"&Another Gradient");

@@ -47,19 +47,37 @@ void LineBrush::BrushMove( const Point source, const Point target )
 		case 1: 
 			double Gx;
 			double Gy;
-			GLubyte color[3][3][3];
-			double intensity[3][3];
-			for (int i = -1; i < 2; i++){
-				for (int j = -1; j < 2; j++){
-					memcpy(color[i+1][j+1], pDoc->GetOriginalPixel(Point(source.x + i, source.y + j)), 3);
-					intensity[i + 1][j + 1] = 0.299*color[i + 1][j + 1][0] + 0.587*color[i + 1][j + 1][1] + 0.144*color[i + 1][j + 1][2];
-				}
+			// GLubyte color[3][3][3];
+			// double intensity[3][3];
+			// for (int i = -1; i < 2; i++){
+			// 	for (int j = -1; j < 2; j++){
+			// 		if(pDoc->m_pUI->getAnotherGradient() && pDoc->m_ucAnotherBitmap) 
+			// 		{
+			// 			memcpy(color[i+1][j+1], pDoc->GetAnotherPixel(Point(source.x + i, source.y + j)), 3);
+			// 		}
+			// 		else memcpy(color[i+1][j+1], pDoc->GetOriginalPixel(Point(source.x + i, source.y + j)), 3);
+			// 		intensity[i + 1][j + 1] = 0.299*color[i + 1][j + 1][0] + 0.587*color[i + 1][j + 1][1] + 0.144*color[i + 1][j + 1][2];
+			// 	}
+			// }
+			// Gx = intensity[0][0] * (-1) + intensity[0][1] * (-2) + intensity[0][2] * (-1)\
+			// 		  + intensity[2][0] * (1) + intensity[2][1] * (2) + intensity[2][2] * (1);
+			// Gy = intensity[0][0] * (-1) + intensity[1][0] * (-2) + intensity[2][0] * (-1)\
+			// 	+ intensity[0][2] * (1) + intensity[1][2] * (2) + intensity[2][2] * (1);
+			if(pDoc->m_pUI->getAnotherGradient() && pDoc->m_ucAnotherBitmap) 
+			{
+				Gx = pDoc->m_nAnotherGradientxy[2*(source.y * pDoc->m_nWidth + source.x)];
+				Gy = pDoc->m_nAnotherGradientxy[2*(source.y * pDoc->m_nWidth + source.x)+1];
 			}
-			Gx = intensity[0][0] * (-1) + intensity[0][1] * (-2) + intensity[0][2] * (-1)\
-					  + intensity[2][0] * (1) + intensity[2][1] * (2) + intensity[2][2] * (1);
-			Gy = intensity[0][0] * (-1) + intensity[1][0] * (-2) + intensity[2][0] * (-1)\
-				+ intensity[0][2] * (1) + intensity[1][2] * (2) + intensity[2][2] * (1);
-			angle = -(int)(atan2(Gy, Gx)*180/Pi) % 360;
+			else
+			{
+				Gx = pDoc->m_nGradientxy[2*(source.y * pDoc->m_nWidth + source.x)];
+				Gy = pDoc->m_nGradientxy[2*(source.y * pDoc->m_nWidth + source.x)+1];
+			}
+			angle = (int)(atan2(Gy, Gx)*180/Pi + 90);
+			if (angle < 0)
+			{
+				angle += 360;
+			}
 			break;
 
 		case 2:

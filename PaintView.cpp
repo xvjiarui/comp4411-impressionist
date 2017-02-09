@@ -270,6 +270,20 @@ void PaintView::autoPaint(){
 					m_pDoc->m_pCurrentBrush->BrushEnd( Point(i,j), Point(i,j));
 				}
 			}
+		}
+		if (m_pDoc->m_pUI->getEdgeClipping())
+		{
+			for (int i = 0; i < width; ++i)
+			{
+				for (int j = 0; j < height; ++j)
+				{
+					if (m_pDoc->m_ucUserEdgeBitmap[3 * (j * width +i)])
+					{
+						m_pDoc->m_pCurrentBrush->BrushBegin( Point(i,j), Point(i,j) );
+						m_pDoc->m_pCurrentBrush->BrushEnd( Point(i,j), Point(i,j));
+					}
+				}
+			}
 		}	
 		// m_pDoc->setSize(temp_size);	
 	}

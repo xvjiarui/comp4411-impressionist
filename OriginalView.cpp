@@ -53,6 +53,10 @@ void OriginalView::draw()
 	{
 		imageChoice = m_pDoc->m_ucEdgeBitmap;
 	}
+	else if (imageIndex == 3)
+	{
+		imageChoice = m_pDoc->m_ucUserEdgeBitmap;
+	}
 
 	if ( imageChoice ) 
 	{
