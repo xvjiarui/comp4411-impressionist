@@ -25,7 +25,10 @@ public:
 	int		dissolveImage(char *iname);			// called by the UI to dissolve image
 	int		loadAnotherImage(char *iname);			// called by the UI to load another image
 	int 	loadEdgeImage(char *iname);
+	int 	loadMuralImage(char *iname);
+	int 	loadAlphaBrush(char *iname);
 	void 	generateRGB();
+
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	void	setBrushType(int type);			// called by the UI to set the brushType
@@ -64,6 +67,9 @@ public:
 	// Dimensions of the paint window.
 	int				m_nPaintWidth, 
 					m_nPaintHeight;	
+	// Alpha brush image info
+	int 			m_nAlphaBrushWidth,
+					m_nAlphaBrushHeight;
 	// Bitmaps for original image and painting.
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucAnotherBitmap;
@@ -73,6 +79,8 @@ public:
 	unsigned char*	m_ucPainting;
 	unsigned char* 	m_ucDisplayBitmap;
 	unsigned char* 	m_ucPrePainting;
+	unsigned char* 	m_ucMuralBitmap;
+	unsigned char* 	m_ucAlphaBrushBitmap;
 	unsigned char* 	m_ucBitmapR;
 	unsigned char* 	m_ucBitmapG;
 	unsigned char* 	m_ucBitmapB;

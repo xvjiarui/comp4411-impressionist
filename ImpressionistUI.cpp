@@ -289,6 +289,20 @@ void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v)
 	}
 }
 
+//------------------------------------------------------------------
+// Brings up a file chooser and then loads the chosen image
+// This is called by the UI when the load mural image menu item is chosen
+//------------------------------------------------------------------
+void ImpressionistUI::cb_load_mural_image(Fl_Menu_* o, void* v) 
+{
+	ImpressionistDoc *pDoc=whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Mural File?", "*.bmp", pDoc->getImageName() );
+	if (newfile != NULL) {
+		pDoc->loadMuralImage(newfile);
+	}
+}
+
 //------------------------------------------------------------
 // Load Edge Image function
 // Called by the UI when the load_edge_image menu item is chosen
@@ -314,6 +328,21 @@ void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v){
 	if (newfile != NULL) {
 		pDoc->loadAnotherImage(newfile);
 	}
+}
+
+//------------------------------------------------------------------
+// Brings up a file chooser and then loads the chosen image
+// This is called by the UI when the load alpha brush menu item is chosen
+//------------------------------------------------------------------
+void ImpressionistUI::cb_load_alpha_brush(Fl_Menu_* o, void* v)
+{
+	ImpressionistDoc *pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadAlphaBrush(newfile);
+	}
+	brushTypeMenu[BRUSH_ALPHA_MAPPED].activate();
 }
 
 
@@ -878,8 +907,9 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Paintly", FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_paintly, 0, FL_MENU_DIVIDER},
 		{ "&Dissolve Image", FL_ALT + 'd', (Fl_Callback *)ImpressionistUI::cb_load_dissolve_image},
 		{ "&Load Edge Image", FL_ALT + 'e', (Fl_Callback *)ImpressionistUI::cb_load_edge_image},
-		{ "&Load Another Image", FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_load_another_image, 0, FL_MENU_DIVIDER},
-
+		{ "&Load Another Image", FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_load_another_image},
+		{ "&Load Mural Image", FL_ALT + 'm', (Fl_Callback *)ImpressionistUI::cb_load_mural_image, 0, FL_MENU_DIVIDER},
+		{ "Load Alpha Brush", FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_load_alpha_brush, 0, FL_MENU_DIVIDER },
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
 
@@ -915,6 +945,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
   {"Blur",				FL_ALT+'b', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_BLUR},
   {"Sharpen",			FL_ALT+'s', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SHARPEN},
+  { "Alpha Mapped", 	FL_ALT+'a', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_ALPHA_MAPPED, FL_MENU_INACTIVE},
   {0}
 };
 

@@ -44,6 +44,8 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucPainting	= NULL;
 	m_ucDisplayBitmap = NULL;
 	m_ucPrePainting = NULL;
+	m_ucMuralBitmap = NULL;
+	m_ucAlphaBrushBitmap = NULL;
 
 	m_nGradientxy = NULL;
 	m_nGradientValue = NULL;
@@ -71,6 +73,8 @@ ImpressionistDoc::ImpressionistDoc()
 		= new BlurBrush( this, "Blur" );
 	ImpBrush::c_pBrushes[BRUSH_SHARPEN]				
 		= new SharpenBrush( this, "Sharpen" );
+	ImpBrush::c_pBrushes[BRUSH_ALPHA_MAPPED]				
+		= new SharpenBrush( this, "Alpha Mapped" );
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
@@ -277,10 +281,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	if ( m_nGradientxy)	delete[] m_nGradientxy;
 	if ( m_nGradientValue) delete[] m_nGradientValue;
 	if ( m_ucDisplayBitmap) delete[] m_ucDisplayBitmap;
-	{
-		/* code */
-	}
-
+	
 	m_ucBitmap		= data;
 	generateRGB();
 	// allocate space for draw view
@@ -503,6 +504,91 @@ int ImpressionistDoc::loadAnotherImage(char *iname)
 	m_pUI->m_paintView->resizeWindow(width, height);	
 	m_pUI->m_paintView->refresh();
 
+
+	return 1;
+}
+
+//---------------------------------------------------------
+// Load the mural image
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::loadMuralImage(char *iname) 
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width, 
+					height;
+
+	if ( (data=readBMP(iname, width, height))==NULL ) 
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (width != m_nWidth || height != m_nHeight)
+	{
+		fl_alert("Diffent size");
+		return 0;
+	}
+	// reflect the fact of loading the new image
+	m_nWidth		= width;
+	m_nPaintWidth	= width;
+	m_nHeight		= height;
+	m_nPaintHeight	= height;
+
+	// release old storage
+	if ( m_ucBitmap ) delete [] m_ucBitmap;
+	if ( m_ucEdgeBitmap) delete[] m_ucEdgeBitmap;
+	if ( m_nGradientxy)	delete[] m_nGradientxy;
+	if ( m_nGradientValue) delete[] m_nGradientValue;
+
+	m_ucBitmap		= data;
+	generateRGB();
+	// Calculate Gradient
+	m_nGradientxy = new int [2 * width * height];
+	m_nGradientValue = new int [width * height];
+	calculateGradient(m_ucBitmap, m_nGradientxy, m_nGradientValue);
+
+	// allocate space for edge view
+	m_ucEdgeBitmap = new GLubyte[3*width*height];
+	calculateEdgeMap(m_pUI->getThreshold());
+
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(width, height);	
+	m_pUI->m_origView->refresh();
+
+	// refresh paint view as well
+	m_pUI->m_paintView->resizeWindow(width, height);	
+	m_pUI->m_paintView->refresh();
+
+
+	return 1;
+}
+//---------------------------------------------------------
+// Load the alpha image
+// This is called by the UI when the load alpha brush button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::loadAlphaBrush(char* iname)
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width,
+		height;
+
+	if ((data = readBMP(iname, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	m_nAlphaBrushWidth = width;
+	m_nAlphaBrushHeight = height;
+
+	//load the bit map
+	if (m_ucAlphaBrushBitmap) delete[] m_ucAlphaBrushBitmap;
+	m_ucAlphaBrushBitmap = data;
 
 	return 1;
 }

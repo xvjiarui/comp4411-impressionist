@@ -20,6 +20,7 @@ enum
 	BRUSH_SCATTERED_CIRCLES,
 	BRUSH_BLUR,
 	BRUSH_SHARPEN,
+	BRUSH_ALPHA_MAPPED,
 	NUM_BRUSH_TYPE // Make sure this stays at the end!
 };
 
@@ -58,6 +59,7 @@ public:
 
 	// according to the source image and the position, determine the draw color
 	void SetColor( const Point source );
+	void SetColor( const Point source, int alpha);
 
 	// get Doc to communicate with it
 	ImpressionistDoc* GetDocument( void );
