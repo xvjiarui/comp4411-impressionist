@@ -710,3 +710,44 @@ GLubyte ImpressionistDoc:: grayPixel( GLubyte*  pixel)
 	return grayPixel(pixel[0], pixel[1], pixel[2]);
 }
 
+void ImpressionistDoc:: applyUserFilter(){
+	int w = m_pUI->getKernelWidth();
+	int h = m_pUI->getKernelHeight();
+	double* kernel = new double[w*h];
+	double sum = 0;
+	for (int i = 0; i < w; ++i)
+	{
+		for (int j = 0; j < h; ++j)
+		{
+			int index = j * w +i;
+			kernel[index] = atof(m_pUI->m_FilterInputs[index]->value());
+			sum += kernel[index];
+		}
+	}
+	if (m_pUI->getNormalize())
+	{
+		for (int i = 0; i < w * h; ++i)
+		{
+			kernel[i] /= sum;
+		}
+	}
+	Filter<double>* userFilter = new Filter<double>(kernel, w, h);
+	delete [] kernel;
+	for (int i = 0; i < m_nWidth; ++i)
+	{
+		for (int j = 0; j < m_nHeight; ++j)
+		{
+			int index = 3 * (j * m_nWidth +i);
+			m_ucPainting[index]=userFilter->applyToPixel(m_ucBitmapR,m_nWidth,m_nHeight,i,j);
+			m_ucPainting[index+1]=userFilter->applyToPixel(m_ucBitmapG,m_nWidth,m_nHeight,i,j);
+			m_ucPainting[index+2]=userFilter->applyToPixel(m_ucBitmapB,m_nWidth,m_nHeight,i,j);
+		}
+	}
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(m_nWidth, m_nHeight);	
+	m_pUI->m_origView->refresh();
+	// refresh paint view as well
+	m_pUI->m_paintView->resizeWindow(m_nWidth, m_nHeight);	
+	m_pUI->m_paintView->refresh();
+}
+

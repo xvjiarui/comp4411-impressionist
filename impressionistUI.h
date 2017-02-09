@@ -15,6 +15,9 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Float_Input.H>
+#include <vector>
 
 #include "Impressionist.h"
 #include "OriginalView.h"
@@ -35,8 +38,13 @@ public:
 
 // for brush dialog
 	Fl_Window*			m_brushDialog;
+	Fl_Window* 			m_filterSizeDialog;
+	Fl_Window* 			m_filterInputDialog;
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_BrushDirectionChoice;
+
+	Fl_Int_Input*		m_filterWidthInput;
+	Fl_Int_Input*		m_filterHeightInput;
 
 	Fl_Slider*			m_BrushSizeSlider;
 	Fl_Slider*			m_BrushLineWidthSlider;
@@ -48,11 +56,16 @@ public:
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button* 			m_AutoPaintButton;
 	Fl_Button*			m_ThresholdChangeButton;
+	Fl_Button*			m_filterSizeSubmitButton;
+	Fl_Button*			m_filterInputApplyButton;
+	Fl_Button* 			m_filterInputNormalButton;
+
 
 	Fl_Light_Button* 	m_EdgeClippingButton;
 	Fl_Light_Button*	m_AnotherGradientButton;
 	Fl_Light_Button*	m_SizeRandomButton;
 
+	std::vector<Fl_Float_Input*> m_FilterInputs;
 
 	// Member functions
 	void				setDocument(ImpressionistDoc* doc);
@@ -71,15 +84,20 @@ public:
 	bool 				getSizeRandom();
 	bool 				getAnotherGradient();
 	bool 				getEdgeClipping();
+	bool 				getNormalize();
 	double				getOpacity();
 	double				getR();
 	double				getG();
 	double				getB();
+	int 				getKernelWidth();
+	int 				getKernelHeight();
 	void 				resetRGB(double r = 1, double g = 1, double b = 1);
 	void				setSize(int size);
 	void 				setLineWidth(int width);
 	void 				setLineAngle(int angle);
 	void 				setOpacity(double opacity);
+
+	void 				showKernel(int weight, int height);
 
 private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
@@ -90,10 +108,13 @@ private:
 	int 	m_nLineAngle;
 	int 	m_nSpacing;
 	int 	m_nThreshold;
+	int 	m_nKernelWidth;
+	int 	m_nKernelHeight;
 	double 	m_dOpacity;
 	bool 	m_bEdgeClipping;
 	bool	m_bAnotherGradient;
 	bool	m_bSizeRandom;
+	bool 	m_bNormalize;
 	static double	m_nR;
 	static double	m_nG;
 	static double	m_nB;
@@ -111,6 +132,7 @@ private:
 	static void	cb_save_image(Fl_Menu_* o, void* v);
 	static void	cb_brushes(Fl_Menu_* o, void* v);
 	static void	cb_clear_canvas(Fl_Menu_* o, void* v);
+	static void	cb_filter(Fl_Menu_* o, void* v);
 	static void cb_colors(Fl_Menu_* o, void* v);
 	static void cb_paintly(Fl_Menu_* o, void* v);
 	static void cb_load_dissolve_image(Fl_Menu_* o, void* v);
@@ -140,6 +162,9 @@ private:
 	static void cb_threshold_change_button(Fl_Widget* o, void* v);
 	static void cb_spacing_slide(Fl_Widget* o, void* v);
 	static void cb_threshold_slide(Fl_Widget * o, void* v);
+	static void cb_filter_size_submit(Fl_Widget* o, void* v);
+	static void cb_filter_input_apply(Fl_Widget* o, void* v);
+	static void cb_filter_input_normalize_lbutton(Fl_Widget* o, void* v);
 
 
 };

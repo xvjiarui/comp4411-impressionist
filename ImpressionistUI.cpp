@@ -12,6 +12,8 @@
 
 #include "impressionistUI.h"
 #include "impressionistDoc.h"
+#include <sstream>
+#include <iostream>
 
 /*
 //------------------------------ Widget Examples -------------------------------------------------
@@ -209,6 +211,16 @@ void ImpressionistUI::cb_brushes(Fl_Menu_* o, void* v)
 	whoami(o)->m_brushDialog->show();
 }
 
+//-------------------------------------------------------------
+// Brings up the filter dialog
+// This is called by the UI when the brushes menu item
+// is chosen
+//-------------------------------------------------------------
+void ImpressionistUI::cb_filter(Fl_Menu_* o, void* v) 
+{
+	whoami(o)->m_filterSizeDialog->show();
+}
+
 //------------------------------------------------------------
 // Clears the paintview canvas.
 // Called by the UI when the clear canvas menu item is chosen
@@ -288,6 +300,7 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 {
 	whoami(o)->m_mainWindow->hide();
 	whoami(o)->m_brushDialog->hide();
+	whoami(o)->m_filterSizeDialog->hide();
 
 }
 
@@ -551,7 +564,59 @@ void ImpressionistUI::cb_threshold_change_button(Fl_Widget* o, void* v)
 	pDoc->m_pUI->m_origView->refresh();
 }
 
+void ImpressionistUI::cb_filter_size_submit(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = (ImpressionistUI*)o->user_data();
+	int width = atoi(pUI->m_filterWidthInput->value());
+	int height = atoi(pUI->m_filterHeightInput->value());
+	width = width > 1 ? width : 1;
+	height = height > 1 ? height : 1;
+	pUI->showKernel(width, height);
+	pUI->m_filterSizeDialog->hide();
+}
 
+void ImpressionistUI::showKernel(int width, int height)
+{
+	int dialogWidth = width * 30 + (width + 1) * 10 + 20;
+	int dialogHeight = height * 20 + (height + 1) * 10 + 80;
+	m_filterInputDialog = new Fl_Window(dialogWidth, dialogHeight, "Filter Kernel Input");
+		m_filterInputDialog->user_data((void*)(this));
+		for (int i = 0; i < width; ++i)
+		{
+			for (int j = 0; j < height; ++j)
+			{
+				Fl_Float_Input *input = new Fl_Float_Input((i +1) * 10 + i * 30, (j + 1) * 10 + j * 20, 30, 20, "");
+				input->value("1.0");
+				m_FilterInputs.push_back(input);
+			}
+		}
+		
+
+		m_filterInputApplyButton = new Fl_Button(dialogWidth / 2 - 40, dialogHeight - 30, 80, 20, "Apply");
+		m_filterInputApplyButton->user_data((void*)(this));
+		m_filterInputApplyButton->callback(cb_filter_input_apply);
+		m_filterInputNormalButton = new Fl_Light_Button (dialogWidth / 2 - 40, dialogHeight - 60, 80, 20, "Normalize");
+		m_filterInputNormalButton->user_data((void*)(this));
+		m_filterInputNormalButton->callback(cb_filter_input_normalize_lbutton);
+	m_filterInputDialog->end();
+
+	m_filterInputDialog->show();
+	m_nKernelHeight = height;
+	m_nKernelWidth = width;
+}
+
+void ImpressionistUI::cb_filter_input_normalize_lbutton(Fl_Widget* o, void* v)
+{
+	ImpressionistUI *pUI=((ImpressionistUI*)(o->user_data()));
+
+	if (pUI->m_bNormalize==TRUE) pUI->m_bNormalize=FALSE;
+	else pUI->m_bNormalize=TRUE;
+}
+
+void ImpressionistUI::cb_filter_input_apply(Fl_Widget* o, void* v){
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+	pDoc->applyUserFilter();
+}
 
 //---------------------------------- per instance functions --------------------------------------
 
@@ -681,6 +746,11 @@ bool ImpressionistUI::getAnotherGradient()
 	return m_bAnotherGradient;
 }
 
+bool ImpressionistUI::getNormalize()
+{
+	return m_bNormalize;
+}
+
 //------------------------------------------------
 // Return the edge clipping
 //------------------------------------------------
@@ -689,6 +759,14 @@ bool ImpressionistUI::getEdgeClipping()
 	return m_bEdgeClipping;
 }
 
+int ImpressionistUI::getKernelWidth()
+{
+	return m_nKernelWidth;
+}
+
+int ImpressionistUI::getKernelHeight(){
+	return m_nKernelHeight;
+}
 //------------------------------------------------
 // Reset RGB default 1 1 1
 //------------------------------------------------
@@ -751,6 +829,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes }, 
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
 		{ "&Colors", FL_ALT + 'k', (Fl_Callback *)ImpressionistUI::cb_colors },
+		{ "&Filters", FL_ALT + 'f', (Fl_Callback *)ImpressionistUI::cb_filter},
 		{ "&Paintly", FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_paintly, 0, FL_MENU_DIVIDER},
 		{ "&Dissolve Image", FL_ALT + 'd', (Fl_Callback *)ImpressionistUI::cb_load_dissolve_image},
 		{ "&Load Edge Image", FL_ALT + 'e', (Fl_Callback *)ImpressionistUI::cb_load_edge_image},
@@ -845,6 +924,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_bEdgeClipping = FALSE;
 	m_bAnotherGradient = FALSE;
 	m_bSizeRandom = FALSE;
+	m_bNormalize = FALSE;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -972,4 +1052,20 @@ ImpressionistUI::ImpressionistUI() {
 
     m_brushDialog->end();	
 
+
+    m_filterSizeDialog = new Fl_Window(250, 250, "Filter Size");
+
+		m_filterWidthInput = new Fl_Int_Input(40, 50, 60, 20, "Width");
+			m_filterWidthInput->labelfont(FL_COURIER);
+			m_filterWidthInput->labelsize(12);
+			m_filterWidthInput->value("1");
+		m_filterHeightInput = new Fl_Int_Input(180, 50, 60, 20, "Height");
+			m_filterHeightInput->labelfont(FL_COURIER);
+			m_filterHeightInput->labelsize(12);
+			m_filterHeightInput->value("1");
+		m_filterSizeSubmitButton = new Fl_Button(80, 150, 80, 20, "&OK");
+			m_filterSizeSubmitButton->user_data((void*)(this));
+			m_filterSizeSubmitButton->callback(cb_filter_size_submit);
+
+	m_filterSizeDialog->end();
 }

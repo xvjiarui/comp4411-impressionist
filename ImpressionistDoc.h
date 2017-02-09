@@ -49,6 +49,8 @@ public:
 	void 	swapViews();
 
 	int 	changeThreshold();
+
+	void 	applyUserFilter();
 	
 
 
