@@ -22,6 +22,8 @@
 #include "ScatteredCircleBrush.h"
 #include "BlurBrush.h"
 #include "SharpenBrush.h"
+#include "AlphaMappedBrush.h"
+#include "WarpBrush.h"
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -74,7 +76,9 @@ ImpressionistDoc::ImpressionistDoc()
 	ImpBrush::c_pBrushes[BRUSH_SHARPEN]				
 		= new SharpenBrush( this, "Sharpen" );
 	ImpBrush::c_pBrushes[BRUSH_ALPHA_MAPPED]				
-		= new SharpenBrush( this, "Alpha Mapped" );
+		= new AlphaMappedBrush( this, "Alpha Mapped" );
+	ImpBrush::c_pBrushes[BRUSH_WARP]				
+		= new WarpBrush( this, "Warp" );
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
@@ -150,6 +154,11 @@ void ImpressionistDoc::setBrushType(int type)
 		m_pUI->m_BrushSizeSlider->deactivate();
 	}
 	else m_pUI->m_BrushSizeSlider->activate();
+
+	if (type == BRUSH_WARP)
+	{
+		setPaintingDone();
+	}
 }
 
 //---------------------------------------------------------
@@ -726,6 +735,86 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 	return GetOriginalPixel( p.x, p.y );
 }
 
+//------------------------------------------------------------------
+// Get the color of the pixel in the painting image at coord x and y
+//------------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetPaintingPixel( int x, int y )
+{
+	if ( x < 0 ) 
+		x = 0;
+	else if ( x >= m_nWidth ) 
+		x = m_nWidth-1;
+
+	if ( y < 0 ) 
+		y = 0;
+	else if ( y >= m_nHeight ) 
+		y = m_nHeight-1;
+
+	return (GLubyte*)(m_ucBitmap + 3 * (y*m_nWidth + x));
+}
+
+//----------------------------------------------------------------
+// Get the color of the pixel in the painting image at point p
+//----------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetPaintingPixel( const Point p )
+{
+	return GetPaintingPixel( p.x, p.y );
+}
+
+//----------------------------------------------------------------
+// Get the color of the pixel in the painting image at point p double
+//----------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetPaintingPixel(double x, double y)
+{
+	int ceilx = ceil(x);
+	int ceily = ceil(y);
+	int floorx = floor(x);
+	int floory = floor(y);
+	if (ceilx == floorx && ceily == floory) return GetPaintingPixel((int)x, (int)y);
+	if (ceilx == floorx || ceily == floory)
+	{
+		GLubyte* pixel1 = GetPaintingPixel(ceilx, ceily);
+		GLubyte* pixel2 = GetPaintingPixel(floorx, floory);
+		//take average of the two pixels
+		GLubyte* pixel = new GLubyte[3];
+		for (int i = 0; i < 3; ++i)
+		{
+			pixel[i] = (pixel1[i] + pixel2[i]) / 2;
+		}
+		return pixel;
+	}
+	GLubyte* pixel1 = GetPaintingPixel(ceilx, ceily);
+	GLubyte* pixel2 = GetPaintingPixel(ceilx, floory);
+	GLubyte* pixel3 = GetPaintingPixel(floorx, ceily);
+	GLubyte* pixel4 = GetPaintingPixel(floorx, floory);
+	//take average of the two pixels
+	GLubyte* pixel = new GLubyte[3];
+	for (int i = 0; i < 3; ++i)
+	{
+		pixel[i] = (pixel1[i] + pixel2[i] + pixel3[i] + pixel4[i]) / 4;
+	}
+	return pixel;
+}
+
+GLubyte* ImpressionistDoc::GetPaintingPixel(const Pointd p)
+{
+	return GetPaintingPixel( p.x, p.y );
+}
+
+//------------------------------------------------------------------
+// SET the color of the pixel in the paint image at coord x and y
+//------------------------------------------------------------------
+void ImpressionistDoc::SetPaintingPixel(int x, int y, const GLubyte* color)
+{
+	//directly ignore outbound situations
+	if (x < m_nWidth && y < m_nHeight && x > 0 && y > 0)
+		memcpy(m_ucPainting + 3 * (y * m_nWidth + x), color, 3);
+}
+void ImpressionistDoc::SetPaintingPixel(const Point p, const GLubyte* color)
+{
+	SetPaintingPixel(p.x, p.y, color);
+}
+
 GLubyte* ImpressionistDoc::GetAnotherPixel( int x, int y )
 {
 	if ( x < 0 ) 
@@ -878,4 +967,10 @@ void ImpressionistDoc::swap(GLubyte* &a, GLubyte* &b)
 	GLubyte* temp = a;
 	a = b;
 	b =a;
+}
+
+void ImpressionistDoc::setPaintingDone(){
+	memcpy ( m_ucPainting, m_ucBitmap, m_nWidth*m_nHeight*3 );
+	m_pUI->m_paintView->resizeWindow(m_nWidth, m_nHeight);	
+	m_pUI->m_paintView->refresh();
 }

@@ -20,6 +20,7 @@ enum
 	BRUSH_SCATTERED_CIRCLES,
 	BRUSH_BLUR,
 	BRUSH_SHARPEN,
+	BRUSH_WARP,
 	BRUSH_ALPHA_MAPPED,
 	NUM_BRUSH_TYPE // Make sure this stays at the end!
 };
@@ -42,8 +43,23 @@ class Point
 public:
 	Point() {};
 	Point(int xx, int yy) { x = xx; y = yy; };
-
+	Point operator-(const Point another) const 
+	{ 
+		return Point(x - another.x, y - another.y); 
+	}
 	int x, y;
+};
+
+class Pointd 
+{
+public:
+	Pointd() {};
+	Pointd(double xx, double yy) { x = xx; y = yy; };
+	Pointd operator-(const Pointd another) const 
+	{ 
+		return Pointd(x - another.x, y - another.y); 
+	}
+	double x, y;
 };
 
 class ImpBrush 

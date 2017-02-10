@@ -119,11 +119,25 @@ public:
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetOriginalPixel( const Point p );  
 
+	// Get the color of the painting picture at the specified coord
+	GLubyte* GetPaintingPixel( int x, int y );   
+	// Get the color of the painting picture at the specified point	
+	GLubyte* GetPaintingPixel( const Point p );  
+
+	// Get the color of the painting picture at the specified coord double
+	GLubyte* GetPaintingPixel( double x, double y );   
+	// Get the color of the painting picture at the specified point	double
+	GLubyte* GetPaintingPixel( const Pointd p );  
 
 	// Get the color of the another picture at the specified coord
 	GLubyte* GetAnotherPixel( int x, int y );   
 	// Get the color of the another picture at the specified point	
 	GLubyte* GetAnotherPixel( const Point p );  
+
+	// Set the color of the another picture at the specified coord
+	void SetPaintingPixel(int x, int y, const GLubyte* color) ; 
+	// Set the color of the another picture at the specified point	
+	void SetPaintingPixel( const Point p, const GLubyte* color);
 
 	// calculate gradient
 	void calculateGradient(unsigned char* source, int* gradientxy, int* value );
@@ -135,6 +149,7 @@ public:
 
 private:
 	char			m_imageName[256];
+	void 			setPaintingDone();
 
 };
 
