@@ -25,6 +25,21 @@
 
 #include "ImpBrush.h"
 
+enum {
+	STYLE_IMPRESSIONIST = 0,
+	STYLE_EXPRESSIONIST,
+	//STYLE_COLORISTWASH,
+	//STYLE_POINTILLIST,
+	STYLE_CUSTOMIZE,
+	NUM_PAINTLYSTYLE
+};
+
+enum {
+	STROKE_CIRCLEBRUSH = 0,
+	STROKE_CURVEDBRUSH,
+	NUM_PAINTLYSTROKE
+};
+
 class ImpressionistUI {
 public:
 	ImpressionistUI();
@@ -41,8 +56,11 @@ public:
 	Fl_Window* 			m_filterSizeDialog;
 	Fl_Window* 			m_filterInputDialog;
 	Fl_Window*			m_dimmedDialog;
+	Fl_Window* 			m_paintlyDialog;
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_BrushDirectionChoice;
+	Fl_Choice*			m_PaintlyStyleChoice;
+	Fl_Choice*			m_paintlyStrokeChoice;
 
 	Fl_Int_Input*		m_filterWidthInput;
 	Fl_Int_Input*		m_filterHeightInput;
@@ -54,13 +72,30 @@ public:
 	Fl_Slider* 			m_SpacingSlider;
 	Fl_Slider* 			m_ThresholdSlider;
 	Fl_Slider*			m_DimmedValueSlider;
-
+	Fl_Slider*			m_paintlyThresholdSlider;
+	Fl_Slider*			m_paintlyMaxBrushSizeSlider;
+	Fl_Slider*			m_paintlyMinBrushSizeSlider;
+	Fl_Slider*			m_paintlyGridSlider;
+	Fl_Slider*			m_paintlyCurvatureSlider;
+	Fl_Slider*			m_paintlyBlurSlider;
+	Fl_Slider*			m_paintlyMaxStrokeLengthSlider;
+	Fl_Slider*			m_paintlyMinStrokeLengthSlider;
+	Fl_Slider*			m_paintlyAlphaSlider;
+	Fl_Slider*			m_paintlyLayersSlider;
+	Fl_Slider*			m_paintlyJrSlider;
+	Fl_Slider*			m_paintlyJgSlider;
+	Fl_Slider*			m_paintlyJbSlider;
+	Fl_Slider*			m_paintlyJhSlider;
+	Fl_Slider*			m_paintlyJsSlider;
+	Fl_Slider*			m_paintlyJvSlider;
+	
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button* 			m_AutoPaintButton;
 	Fl_Button*			m_ThresholdChangeButton;
 	Fl_Button*			m_filterSizeSubmitButton;
 	Fl_Button*			m_filterInputApplyButton;
 	Fl_Button* 			m_filterInputNormalButton;
+	Fl_Button*			m_paintlyApplyButton;
 
 
 	Fl_Light_Button* 	m_EdgeClippingButton;
@@ -94,6 +129,22 @@ public:
 	double				getB();
 	int 				getKernelWidth();
 	int 				getKernelHeight();
+	int 				getPaintlyThreshold();
+	int 				getPaintlyMaxBrush();
+	int 				getPianlyMinBrush();
+	int 				getPaintlyMaxStroke();
+	int 				getPaintlyMinStroke();
+	int 				getPaintlyLayers();
+	double 				getPaintlyGrid();
+	double 				getPaintlyCurvature();
+	double				getPaintlyBlur();
+	double				getPaintlyAlpha();
+	double				getPaintlyJr();
+	double				getPaintlyJg();
+	double				getPaintlyJb();
+	double				getPaintlyJh();
+	double				getPaintlyJs();
+	double				getPaintlyJv();
 	void 				resetRGB(double r = 1, double g = 1, double b = 1);
 	void				setSize(int size);
 	void 				setLineWidth(int width);
@@ -113,6 +164,22 @@ private:
 	int 	m_nThreshold;
 	int 	m_nKernelWidth;
 	int 	m_nKernelHeight;
+	int		m_nPaintlyThreshold;
+	int 	m_nPaintlyMaxBrush;
+	int 	m_nPaintlyMinBrush;
+	int		m_nPaintlyMaxStroke;
+	int		m_nPaintlyMinStroke;
+	int		m_nPaintlyLayers;
+	double 	m_dPaintlyGrid;
+	double 	m_dPaintlyCurvature;
+	double 	m_dPaintlyBlur;
+	double 	m_dPaintlyAlpha;
+	double 	m_dPaintlyJr;
+	double 	m_dPaintlyJg;
+	double 	m_dPaintlyJb;
+	double 	m_dPaintlyJh;
+	double 	m_dPaintlyJs;
+	double 	m_dPaintlyJv;
 	double 	m_dOpacity;
 	bool 	m_bEdgeClipping;
 	bool	m_bAnotherGradient;
@@ -127,6 +194,9 @@ private:
 	static Fl_Menu_Item		menuitems[];
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
 	static Fl_Menu_Item		brushDirectionMenu[NUM_BRUSH_DIRECTION+1];
+	static Fl_Menu_Item		paintlyStyleMenu[NUM_PAINTLYSTYLE + 1];
+	static Fl_Menu_Item		paintlyStrokeMenu[NUM_PAINTLYSTROKE + 1];
+
 
 	static ImpressionistUI*	whoami(Fl_Menu_* o);
 
@@ -174,6 +244,26 @@ private:
 	static void cb_filter_input_apply(Fl_Widget* o, void* v);
 	static void cb_filter_input_normalize_lbutton(Fl_Widget* o, void* v);
 	static void cb_restore_painting(Fl_Widget* o, void* v);
+	static void cb_paintly_window(Fl_Menu_* o, void* v);
+	static void cb_paintlyStyleChoice(Fl_Widget* o, void* v);
+	static void cb_paintlyStrokeChoice(Fl_Widget* o, void* v);
+	static void cb_paintlyApply(Fl_Widget* o, void* v);
+	static void cb_paintlyThresholdSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyMaxBrushSizeSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyMinBrushSizeSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyGridSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyCurvatureSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyBlurSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyMaxStrokeLengthSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyMinStrokeLengthSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyAlphaSlider(Fl_Widget* o, void* v);
+	static void cb_paintlyLayersSlider(Fl_Widget* o, void* v);
+	static void	cb_paintlyJrSlider(Fl_Widget* o, void* v);
+	static void	cb_paintlyJgSlider(Fl_Widget* o, void* v);
+	static void	cb_paintlyJbSlider(Fl_Widget* o, void* v);
+	static void	cb_paintlyJhSlider(Fl_Widget* o, void* v);
+	static void	cb_paintlyJsSlider(Fl_Widget* o, void* v);
+	static void	cb_paintlyJvSlider(Fl_Widget* o, void* v);
 
 
 };
