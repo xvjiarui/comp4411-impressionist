@@ -12,6 +12,7 @@
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <stdlib.h>
+#include <vector>
 
 class ImpressionistDoc;
 
@@ -33,6 +34,18 @@ public:
 	void autoPaint();
 
 	void triggerAutoPaint();
+
+	void paintly();
+
+	void triggerPaintly();
+
+	void paintlyBlur(unsigned char* source, unsigned char* reference, int brushSize);
+
+	void paintlyDiff(unsigned char* canvas, unsigned char* reference, unsigned char* diff);
+
+	void paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsigned char* reference, double gridRate, int brushSize, int threshold);
+
+	void PaintView::makeCurved(const Point& start, unsigned char* reference, int brushSize, unsigned char* canvas, std::vector<Point>& vP, std::vector<int>& vR, std::vector<int>& vG, std::vector<int>& vB);
 
 	ImpressionistDoc *m_pDoc;
 

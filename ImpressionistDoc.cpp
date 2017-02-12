@@ -84,6 +84,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
 	m_nType = 0;
 	m_nDirection = 0;
+	m_nPaintlyStrokeType = 1;
 
 	// init filter
 	int SobelX[9] = { -1, 0, 1,
@@ -160,6 +161,12 @@ void ImpressionistDoc::setBrushType(int type)
 		setPaintingDone();
 	}
 }
+
+void ImpressionistDoc::setPaintlyStrokeType(int type)
+{
+	m_nPaintlyStrokeType = type;
+}
+
 
 //---------------------------------------------------------
 // Called by the UI when the user changes the brush direction.

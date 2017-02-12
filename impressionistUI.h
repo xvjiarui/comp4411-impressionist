@@ -131,7 +131,7 @@ public:
 	int 				getKernelHeight();
 	int 				getPaintlyThreshold();
 	int 				getPaintlyMaxBrush();
-	int 				getPianlyMinBrush();
+	int 				getPaintlyMinBrush();
 	int 				getPaintlyMaxStroke();
 	int 				getPaintlyMinStroke();
 	int 				getPaintlyLayers();
@@ -247,7 +247,7 @@ private:
 	static void cb_paintly_window(Fl_Menu_* o, void* v);
 	static void cb_paintlyStyleChoice(Fl_Widget* o, void* v);
 	static void cb_paintlyStrokeChoice(Fl_Widget* o, void* v);
-	static void cb_paintlyApply(Fl_Widget* o, void* v);
+	static void cb_paintly_apply_button(Fl_Widget* o, void* v);
 	static void cb_paintlyThresholdSlider(Fl_Widget* o, void* v);
 	static void cb_paintlyMaxBrushSizeSlider(Fl_Widget* o, void* v);
 	static void cb_paintlyMinBrushSizeSlider(Fl_Widget* o, void* v);

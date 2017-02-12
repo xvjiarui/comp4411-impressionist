@@ -690,29 +690,85 @@ void ImpressionistUI::cb_paintlyStyleChoice(Fl_Widget* o, void* v)
 	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
 	ImpressionistDoc* pDoc = pUI->getDocument();
 	int type = (int)v;
-	// pDoc->setPaintlyStyle(type);
+	if (type != STYLE_CUSTOMIZE)
+	{
+		pUI->m_paintlyStrokeChoice->deactivate();
+		pUI->m_paintlyGridSlider->deactivate();
+		pUI->m_paintlyThresholdSlider->deactivate();
+		pUI->m_paintlyMaxBrushSizeSlider->deactivate();
+		pUI->m_paintlyMinBrushSizeSlider->deactivate();
+		pUI->m_paintlyMaxStrokeLengthSlider->deactivate();
+		pUI->m_paintlyMinStrokeLengthSlider->deactivate();
+		pUI->m_paintlyCurvatureSlider->deactivate();
+		pUI->m_paintlyBlurSlider->deactivate();
+		pUI->m_paintlyAlphaSlider->deactivate();
+		pUI->m_paintlyLayersSlider->deactivate();
+		if (type == STYLE_IMPRESSIONIST)
+		{	
+			pUI->m_paintlyStrokeChoice->value(1);
+			pUI->m_nPaintlyThreshold = 30;
+			pUI->m_nPaintlyMaxBrush = 8;
+			pUI->m_nPaintlyMinBrush = 2;
+			pUI->m_dPaintlyGrid = 1.0;
+			pUI->m_dPaintlyCurvature = 1.0;
+			pUI->m_dPaintlyBlur = 0.8;
+			pUI->m_nPaintlyMaxStroke = 8;
+			pUI->m_nPaintlyMinStroke = 4;
+			pUI->m_dPaintlyAlpha = 0.85;
+			pUI->m_nPaintlyLayers = 2;
+		}
+		else if (type == STYLE_EXPRESSIONIST)
+		{
+			pUI->m_nPaintlyThreshold = 10;
+			pUI->m_nPaintlyMaxBrush = 7;
+			pUI->m_nPaintlyMinBrush = 3;
+			pUI->m_dPaintlyGrid = 1.0;
+			pUI->m_dPaintlyCurvature = 0.45;
+			pUI->m_dPaintlyBlur = 0.5;
+			pUI->m_nPaintlyMaxStroke = 20;
+			pUI->m_nPaintlyMinStroke = 12;
+			pUI->m_dPaintlyAlpha = 1.0;
+			pUI->m_nPaintlyLayers = 3;
+		}
+	}
+	else
+	{	
+		pUI->m_paintlyStrokeChoice->activate();
+		pUI->m_paintlyGridSlider->activate();
+		pUI->m_paintlyThresholdSlider->activate();
+		pUI->m_paintlyMaxBrushSizeSlider->activate();
+		pUI->m_paintlyMinBrushSizeSlider->activate();
+		pUI->m_paintlyMaxStrokeLengthSlider->activate();
+		pUI->m_paintlyMinStrokeLengthSlider->activate();
+		pUI->m_paintlyCurvatureSlider->activate();
+		pUI->m_paintlyBlurSlider->activate();
+		pUI->m_paintlyAlphaSlider->activate();
+		pUI->m_paintlyLayersSlider->activate();
+	}
 }
 
 void ImpressionistUI::cb_paintlyStrokeChoice(Fl_Widget* o, void* v)
 {
-	// ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
-	// ImpressionistDoc* pDoc = pUI->getDocument();
-	// int type = (int)v;
-	// switch (type)
-	// {
-	// case STROKE_CIRCLEBRUSH:
-	// 	pDoc->setPaintlyStroke(type);
-	// 	pDoc->setBrushType(BRUSH_CIRCLES); cout << "here" << endl;
-	// 	break;
-	// case STROKE_CURVEDBRUSH:
-	// 	pDoc->setPaintlyStroke(type);
-	// 	break;
-	// }
+	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+	int type = (int)v;
+	switch (type)
+	{
+	case STROKE_CIRCLEBRUSH:
+		pDoc->setPaintlyStrokeType(type);
+		pDoc->setBrushType(BRUSH_CIRCLES); 
+		break;
+	case STROKE_CURVEDBRUSH:
+		pDoc->setPaintlyStrokeType(type);
+		break;
+	}
 }
 
-void ImpressionistUI::cb_paintlyApply(Fl_Widget* o, void* v)
+void ImpressionistUI::cb_paintly_apply_button(Fl_Widget* o, void* v)
 {
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
 
+	pDoc->m_pUI->m_paintView->triggerPaintly();
 }
 
 void ImpressionistUI::cb_paintlyThresholdSlider(Fl_Widget* o, void* v)
@@ -1012,7 +1068,7 @@ int ImpressionistUI:: getPaintlyMaxBrush()
 {
 	return m_nPaintlyMaxBrush;
 }
-int ImpressionistUI:: getPianlyMinBrush()
+int ImpressionistUI:: getPaintlyMinBrush()
 {
 	return m_nPaintlyMinBrush;
 }
@@ -1388,7 +1444,7 @@ ImpressionistUI::ImpressionistUI() {
 
 		m_paintlyApplyButton = new Fl_Button(400, 15, 60, 25, "&Paint");
 		m_paintlyApplyButton->user_data((void*)(this));
-		m_paintlyApplyButton->callback(cb_paintlyApply);
+		m_paintlyApplyButton->callback(cb_paintly_apply_button);
 
 		m_paintlyThresholdSlider = new Fl_Value_Slider(15, 60, 200, 20, "Threshold");
 		m_paintlyThresholdSlider->user_data((void*)(this));

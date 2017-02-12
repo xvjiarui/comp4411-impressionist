@@ -19,6 +19,7 @@
 #define RIGHT_MOUSE_DRAG	5
 #define RIGHT_MOUSE_UP		6
 #define AUTO_PAINT			7
+#define PAINTLY 			8
 
 
 #ifndef WIN32
@@ -154,7 +155,11 @@ void PaintView::draw()
 			SaveCurrentContent();
 			RestoreContent();
 			break;
-
+		case PAINTLY:
+			paintly();
+			SaveCurrentContent();
+			RestoreContent();
+			break;
 		default:
 			printf("Unknown event!!\n");		
 			break;
@@ -303,6 +308,13 @@ void PaintView::triggerAutoPaint()
 	redraw();
 }
 
+void PaintView::triggerPaintly()
+{
+	isAnEvent = 1;
+	eventToDo = PAINTLY;
+	redraw();
+}
+
 void PaintView::SaveCurrentContent()
 {
 	// Tell openGL to read from the front buffer when capturing
@@ -338,4 +350,215 @@ void PaintView::RestoreContent()
 				  m_pPaintBitstart);
 
 //	glDrawBuffer(GL_FRONT);
+}
+
+void PaintView::paintly()
+{
+	int width = m_pDoc->m_nWidth;
+	int height = m_pDoc->m_nHeight;
+	
+	unsigned char* canvas = m_pDoc->m_ucPainting;
+	unsigned char* reference = new unsigned char[width*height*3];
+	unsigned char* diff = new unsigned char[width*height];
+	memset(canvas, 0, width*height*3);
+
+	int maxBrushSize = m_pDoc->m_pUI->getPaintlyMaxBrush();
+	int minBrushSize = m_pDoc->m_pUI->getPaintlyMinBrush();
+	double gridRate = m_pDoc->m_pUI->getPaintlyGrid();
+	int threshold = m_pDoc->m_pUI->getPaintlyThreshold();
+	int layers = m_pDoc->m_pUI->getPaintlyLayers();
+	int brushSizeDecay = (maxBrushSize - minBrushSize) / layers;
+
+	brushSizeDecay = brushSizeDecay > 1 ? brushSizeDecay : 1;
+
+	for (int i = maxBrushSize; i >= minBrushSize; i-=brushSizeDecay) {
+		paintlyBlur(m_pDoc->m_ucBitmap, reference, i);
+		paintlyDiff(canvas, reference, diff);
+		paintlyLayer(canvas, diff, reference, gridRate, i, threshold);
+	}
+	// m_pDoc->m_pUI->m_paintView->refresh();//????
+	printf("hhh\n");
+	//glFlush();
+	//m_pDoc->m_pUI->m_paintView->refresh();
+}
+
+void PaintView::paintlyBlur(unsigned char* source, unsigned char* reference, int brushSize)
+{
+	int width = m_pDoc->m_nWidth;
+	int height = m_pDoc->m_nHeight;
+	double kernel[] = { 0, 1, 2, 1, 0, 1, 5, 9, 5, 1, 2, 9, 15, 9, 2, 1, 5, 9, 5, 1, 0, 1, 2, 1, 0 };
+	int kernelSize = 5;
+	double Weight = 87;
+	for (int i = 0; i < height; i += 1)
+	{
+		for (int j = 0; j < width; j += 1)
+		{
+			int referencePosition = i * width + j;
+			double sum[3] = { 0, 0, 0 };
+			for (int _i = 0; _i < kernelSize; _i++)
+			{
+				for (int _j = 0; _j < kernelSize; _j++)
+				{
+					int curY = i + _i - kernelSize / 2;
+					int curX = j + _j - kernelSize / 2;
+					if (curY < 0 || curY > height - 1 || curX < 0 || curX > width - 1) continue;
+					sum[0] += (double)source[(curY*width + curX) * 3] * kernel[_i*kernelSize + _j];
+					sum[1] += (double)source[(curY*width + curX) * 3 + 1] * kernel[_i*kernelSize + _j];
+					sum[2] += (double)source[(curY*width + curX) * 3 + 2] * kernel[_i*kernelSize + _j];
+				}
+			}
+			for (int k = 0; k < 3; k++) {
+				double res = sum[k] / Weight;
+				if (res < 0) res = 0;
+				if (res > 255) res = 255;
+				reference[referencePosition * 3 + k] = (unsigned char)res;
+			}
+		}
+	}
+}
+
+void PaintView::paintlyDiff(unsigned char* canvas, unsigned char* reference, unsigned char* diff)
+{
+	int width = m_pDoc->m_nWidth;
+	int height = m_pDoc->m_nHeight;
+
+	for (int i = 0; i < height; ++i)
+	{
+		for (int j = 0; j < width; ++j)
+		{
+			int pos = i * width + j;
+			diff[pos] = (reference[pos * 3] - canvas[pos * 3]) * (reference[pos * 3] - canvas[pos * 3])
+				+ (reference[pos * 3 + 1] - canvas[pos * 3 + 1]) * (reference[pos * 3 + 1] - canvas[pos * 3 + 1])
+				+ (reference[pos * 3 + 2] - canvas[pos * 3 + 2]) * (reference[pos * 3 + 2] - canvas[pos * 3 + 2]);
+			diff[pos] = (unsigned char)sqrt((double)diff[pos]);
+			
+		}
+	}
+}
+
+void PaintView::makeCurved(const Point& start, unsigned char* reference, int brushSize, unsigned char* canvas, std::vector<Point>& vP, std::vector<int>& vR, std::vector<int>& vG, std::vector<int>& vB)
+{
+	int startX = start.x;
+	int startY = start.y;
+	unsigned char strokeColorR = reference[(startY*m_nDrawWidth + startX) * 3];
+	unsigned char strokeColorG = reference[(startY*m_nDrawWidth + startX) * 3 + 1];
+	unsigned char strokeColorB = reference[(startY*m_nDrawWidth + startX) * 3 + 2];
+	vP.push_back(Point(startX, startY));
+	vR.push_back(strokeColorR);
+	vG.push_back(strokeColorG);
+	vB.push_back(strokeColorB);
+	int x = startX, y = startY;
+	int lastDx = 0, lastDy = 0;
+
+	for (int i = 1; i <= m_pDoc->m_pUI->getPaintlyMaxStroke(); i++)
+	{
+		if (i > m_pDoc->m_pUI->getPaintlyMinStroke())
+		{
+			int diff1 = reference[(y*m_nDrawWidth + x) * 3] - canvas[(y*m_nDrawWidth + x) * 3]
+				+ reference[(y*m_nDrawWidth + x) * 3 + 1] - canvas[(y*m_nDrawWidth + x) * 3 + 1]
+				+ reference[(y*m_nDrawWidth + x) * 3 + 2] - canvas[(y*m_nDrawWidth + x) * 3 + 2];
+			int diff2 = reference[(y*m_nDrawWidth + x) * 3] - strokeColorR
+				+ reference[(y*m_nDrawWidth + x) * 3 + 1] - strokeColorG
+				+ reference[(y*m_nDrawWidth + x) * 3 + 2] - strokeColorB;
+			if (abs(diff1) < abs(diff2)) return;
+		}
+
+		int gradientX = (int)m_pDoc->m_nGradientxy[y * m_nDrawWidth + x];
+		int gradientY = (int)m_pDoc->m_nGradientxy[y * m_nDrawWidth + x + 1];
+
+		int dx = -gradientY;
+		int dy = gradientX;
+
+		if (lastDx * dx + lastDy * dy < 0)
+		{
+			dx = -dx;
+			dy = -dy;
+		}
+		if (dx == 0 && dy == 0) return;
+
+		dx = m_pDoc->m_pUI->getPaintlyCurvature()*dx + lastDx*(1 - m_pDoc->m_pUI->getPaintlyCurvature());
+		dy = m_pDoc->m_pUI->getPaintlyCurvature()*dy + lastDy*(1 - m_pDoc->m_pUI->getPaintlyCurvature());
+		double tempX = (dx) / (sqrt((double)(dx*dx + dy*dy)));
+		double tempY = (dy) / (sqrt((double)(dx*dx + dy*dy)));
+		x = x + brushSize*tempX;
+		y = y + brushSize*tempY;
+		lastDx = dx;
+		lastDy = dy;
+		if (x < 0 || y < 0 || x > m_nDrawWidth-1 || y > m_nDrawHeight-1) return;
+ 		vP.push_back(Point(x, y));
+		vR.push_back(strokeColorR);
+		vG.push_back(strokeColorG);
+		vB.push_back(strokeColorB);
+	}
+}
+
+void PaintView::paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsigned char* reference, double gridRate, int brushSize, int threshold)
+{
+	int width = m_pDoc->m_nWidth;
+	int height = m_pDoc->m_nHeight;
+
+	int gridSize = (int)(gridRate * brushSize);
+	std::vector<Point> vec;
+	for (int i = 0; i < height; i += gridSize)
+	{
+		for (int j = 0; j < width; j += gridSize)
+		{
+			double sumError = 0;
+			double maxError = -10.0;
+			int maxErrorIndX = 0;
+			int maxErrorIndY = 0;
+
+			for (int ni = -gridSize / 2; ni < gridSize / 2; ni++)
+			{
+				for (int nj = -gridSize / 2; nj < gridSize / 2; nj++)
+				{
+					int curY = i + ni, curX = j + nj;
+					
+					if (curX < 0 || curY < 0 || curY > height - 1 || curX > width - 1) continue;
+					
+					sumError += ((double)diff[curY * width + curX]);// / (gridSize*gridSize);
+					
+					if (diff[curY * width + curX] > maxError)
+					{
+						maxError = diff[curY * width + curX];
+						maxErrorIndX = curX; maxErrorIndY = curY;
+					}
+				}
+			}
+
+			if (sumError > threshold)
+			{
+				vec.push_back(Point(maxErrorIndX, maxErrorIndY));
+			}
+		}
+	}
+	std::random_shuffle(vec.begin(), vec.end());
+	m_pDoc->m_pUI->setSize(brushSize);
+	
+	for (int i = 0; i < vec.size(); ++i)
+	{
+		if (m_pDoc->m_nPaintlyStrokeType == STROKE_CURVEDBRUSH)
+		{
+			std:: vector<Point> vp;
+			std:: vector<int> vr;
+			std:: vector<int> vg;
+			std:: vector<int> vb;
+			makeCurved(vec[i], reference, brushSize, canvas, vp, vr, vg, vb);
+			for (int j = 0; j < vp.size(); j++) 
+			{
+				// CircleBrush* a = (CircleBrush*)m_pDoc->m_pCurrentBrush;
+				// a->DrawCircle(vp[0], vp[j], (((float)(brushSize*2))/3.0));
+				m_pDoc->setBrushType(BRUSH_CIRCLES);
+				m_pDoc->setSize(brushSize);
+				m_pDoc->m_pCurrentBrush->BrushBegin(vp[0], vp[j]);
+				m_pDoc->m_pCurrentBrush->BrushEnd(vp[0], vp[j]);
+			}
+		}
+		else
+		{
+			m_pDoc->setBrushType(BRUSH_CIRCLES);
+			m_pDoc->m_pCurrentBrush->BrushBegin(vec[i], vec[i]);
+			m_pDoc->m_pCurrentBrush->BrushEnd(vec[i], vec[i]);
+		}
+	}
 }
