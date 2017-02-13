@@ -312,6 +312,7 @@ void PaintView::triggerPaintly()
 {
 	isAnEvent = 1;
 	eventToDo = PAINTLY;
+	m_pDoc->generateBlur();
 	redraw();
 }
 
@@ -386,33 +387,21 @@ void PaintView::paintlyBlur(unsigned char* source, unsigned char* reference, int
 {
 	int width = m_pDoc->m_nWidth;
 	int height = m_pDoc->m_nHeight;
-	double kernel[] = { 0, 1, 2, 1, 0, 1, 5, 9, 5, 1, 2, 9, 15, 9, 2, 1, 5, 9, 5, 1, 0, 1, 2, 1, 0 };
-	int kernelSize = 5;
-	double Weight = 87;
-	for (int i = 0; i < height; i += 1)
+	for (int i = 0; i < width; ++i)
 	{
-		for (int j = 0; j < width; j += 1)
+		for (int j = 0; j < height; ++j)
 		{
-			int referencePosition = i * width + j;
-			double sum[3] = { 0, 0, 0 };
-			for (int _i = 0; _i < kernelSize; _i++)
+			// double result =  m_pDoc->f_Gaussian->applyToPixel(source, width, height, i, j );
+			double result = m_pDoc->f_blur->applyToPixel(source,width,height,i,j);
+			if (result < 0 )
 			{
-				for (int _j = 0; _j < kernelSize; _j++)
-				{
-					int curY = i + _i - kernelSize / 2;
-					int curX = j + _j - kernelSize / 2;
-					if (curY < 0 || curY > height - 1 || curX < 0 || curX > width - 1) continue;
-					sum[0] += (double)source[(curY*width + curX) * 3] * kernel[_i*kernelSize + _j];
-					sum[1] += (double)source[(curY*width + curX) * 3 + 1] * kernel[_i*kernelSize + _j];
-					sum[2] += (double)source[(curY*width + curX) * 3 + 2] * kernel[_i*kernelSize + _j];
-				}
+				result = 0;
 			}
-			for (int k = 0; k < 3; k++) {
-				double res = sum[k] / Weight;
-				if (res < 0) res = 0;
-				if (res > 255) res = 255;
-				reference[referencePosition * 3 + k] = (unsigned char)res;
+			if (result > 255)
+			{
+				result = 255;
 			}
+			reference[ i* height + j] = (unsigned char) result;
 		}
 	}
 }

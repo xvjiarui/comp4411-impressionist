@@ -108,6 +108,8 @@ ImpressionistDoc::ImpressionistDoc()
 	f_SobelY = new Filter<int>(SobelY,3,3);
 	f_Gaussian = new Filter<double>(Gaussian,3,3);
 	f_Sharpen = new Filter<int>(Sharpen,3,3);
+	f_blur = NULL;
+	
 
 }
 
@@ -980,4 +982,25 @@ void ImpressionistDoc::setPaintingDone(){
 	memcpy ( m_ucPainting, m_ucBitmap, m_nWidth*m_nHeight*3 );
 	m_pUI->m_paintView->resizeWindow(m_nWidth, m_nHeight);	
 	m_pUI->m_paintView->refresh();
+}
+
+void ImpressionistDoc:: generateBlur()
+{
+	double f_sigma = m_pUI->getPaintlyBlur();
+	int kernel_size = 50 * f_sigma;
+	double* kernel = new double[ kernel_size * kernel_size];
+	double sum = 0;
+	for (int i = 0; i < kernel_size; ++i)
+	{
+		for (int j = 0; j < kernel_size; ++j)
+		{
+			kernel[ i * kernel_size + j] = 1/(2* 3.1415926)*exp(-(i - kernel_size/2) * (i - kernel_size/2) - (j - kernel_size/2) * (j - kernel_size/2));
+			sum += kernel[ i* kernel_size + j];
+		}
+	}
+	for (int i = 0; i < kernel_size * kernel_size; ++i)
+	{
+		kernel[i] /= sum;
+	}
+	f_blur = new Filter<double>(kernel, kernel_size, kernel_size);
 }

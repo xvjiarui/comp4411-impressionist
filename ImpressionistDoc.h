@@ -58,6 +58,7 @@ public:
 	void 	applyUserFilter();
 	void 	changeDimmedValue();
 	void 	swap(GLubyte* &a, GLubyte* &b);
+	void 	generateBlur();
 
 
 // Attributes
@@ -112,6 +113,7 @@ public:
 	Filter<int>* f_SobelY;
 	Filter<double>* f_Gaussian;
 	Filter<int>* f_Sharpen;
+	Filter<double>* f_blur;
 
 
 // Operations
