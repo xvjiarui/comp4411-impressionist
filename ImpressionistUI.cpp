@@ -823,16 +823,19 @@ void ImpressionistUI::cb_paintlyLayersSlider(Fl_Widget* o, void* v)
 void ImpressionistUI::cb_paintlyJrSlider(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_dPaintlyJr=double( ((Fl_Slider *)o)->value() ) ;
+	m_nR = double( ((Fl_Slider *)o)->value() ) ;
 }
 
 void ImpressionistUI::cb_paintlyJgSlider(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_dPaintlyJg=double( ((Fl_Slider *)o)->value() ) ;
+	m_nG = double( ((Fl_Slider *)o)->value() ) ;
 }
 
 void ImpressionistUI::cb_paintlyJbSlider(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_dPaintlyJb=double( ((Fl_Slider *)o)->value() ) ;
+	m_nB = double( ((Fl_Slider *)o)->value() ) ;
 }
 
 void ImpressionistUI::cb_paintlyJhSlider(Fl_Widget* o, void* v)
@@ -1440,6 +1443,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyStrokeChoice->user_data((void*)(this));
 		m_paintlyStrokeChoice->menu(paintlyStrokeMenu);
 		m_paintlyStrokeChoice->callback(cb_paintlyStrokeChoice);
+		m_paintlyStrokeChoice->value(1);
 		m_paintlyStrokeChoice->deactivate();
 
 		m_paintlyApplyButton = new Fl_Button(400, 15, 60, 25, "&Paint");

@@ -975,7 +975,7 @@ void ImpressionistDoc::swap(GLubyte* &a, GLubyte* &b)
 {
 	GLubyte* temp = a;
 	a = b;
-	b =a;
+	b =temp;
 }
 
 void ImpressionistDoc::setPaintingDone(){
@@ -986,21 +986,25 @@ void ImpressionistDoc::setPaintingDone(){
 
 void ImpressionistDoc:: generateBlur()
 {
+	printf("blur\n");
 	double f_sigma = m_pUI->getPaintlyBlur();
 	int kernel_size = 50 * f_sigma;
+	int sigma = 7;
 	double* kernel = new double[ kernel_size * kernel_size];
 	double sum = 0;
 	for (int i = 0; i < kernel_size; ++i)
 	{
 		for (int j = 0; j < kernel_size; ++j)
 		{
-			kernel[ i * kernel_size + j] = 1/(2* 3.1415926)*exp(-(i - kernel_size/2) * (i - kernel_size/2) - (j - kernel_size/2) * (j - kernel_size/2));
+			kernel[ i * kernel_size + j] = 1/(2 * 3.1415926 * sigma * sigma)*exp((-(i - kernel_size/2) * (i - kernel_size/2) - (j - kernel_size/2) * (j - kernel_size/2))/(sigma * sigma));
 			sum += kernel[ i* kernel_size + j];
 		}
 	}
+	// printf("sum:%f\n", sum);
 	for (int i = 0; i < kernel_size * kernel_size; ++i)
 	{
 		kernel[i] /= sum;
+		// printf("%f\n", kernel[i]);
 	}
 	f_blur = new Filter<double>(kernel, kernel_size, kernel_size);
 }

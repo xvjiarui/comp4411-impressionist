@@ -41,7 +41,7 @@ public:
 
 	void paintlyBlur(unsigned char* source, unsigned char* reference, int brushSize);
 
-	void paintlyDiff(unsigned char* canvas, unsigned char* reference, unsigned char* diff);
+	void paintlyDifferenceCalculate(unsigned char* canvas, unsigned char* reference, unsigned char* diff);
 
 	void paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsigned char* reference, double gridRate, int brushSize, int threshold);
 

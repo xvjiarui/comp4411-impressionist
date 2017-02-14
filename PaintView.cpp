@@ -374,11 +374,10 @@ void PaintView::paintly()
 
 	for (int i = maxBrushSize; i >= minBrushSize; i-=brushSizeDecay) {
 		paintlyBlur(m_pDoc->m_ucBitmap, reference, i);
-		paintlyDiff(canvas, reference, diff);
+		paintlyDifferenceCalculate(canvas, reference, diff);
 		paintlyLayer(canvas, diff, reference, gridRate, i, threshold);
 	}
 	// m_pDoc->m_pUI->m_paintView->refresh();//????
-	printf("hhh\n");
 	//glFlush();
 	//m_pDoc->m_pUI->m_paintView->refresh();
 }
@@ -406,7 +405,7 @@ void PaintView::paintlyBlur(unsigned char* source, unsigned char* reference, int
 	}
 }
 
-void PaintView::paintlyDiff(unsigned char* canvas, unsigned char* reference, unsigned char* diff)
+void PaintView::paintlyDifferenceCalculate(unsigned char* canvas, unsigned char* reference, unsigned char* diff)
 {
 	int width = m_pDoc->m_nWidth;
 	int height = m_pDoc->m_nHeight;
