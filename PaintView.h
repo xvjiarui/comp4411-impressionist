@@ -45,7 +45,7 @@ public:
 
 	void paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsigned char* reference, double gridRate, int brushSize, int threshold);
 
-	void PaintView::makeCurved(const Point& start, unsigned char* reference, int brushSize, unsigned char* canvas, std::vector<Point>& vP, std::vector<int>& vR, std::vector<int>& vG, std::vector<int>& vB);
+	void PaintView::makeCurved(const Point& start, unsigned char* reference, int brushSize, unsigned char* canvas, std::vector<Point>& vP);
 
 	ImpressionistDoc *m_pDoc;
 

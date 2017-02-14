@@ -10,6 +10,7 @@
 #include "impressionistUI.h"
 #include "paintview.h"
 #include "ImpBrush.h"
+#include "CircleBrush.h"
 
 
 #define LEFT_MOUSE_DOWN		1
@@ -310,6 +311,7 @@ void PaintView::triggerAutoPaint()
 
 void PaintView::triggerPaintly()
 {
+	printf("%d\n", m_pDoc->m_nPaintlyStrokeType);
 	isAnEvent = 1;
 	eventToDo = PAINTLY;
 	m_pDoc->generateBlur();
@@ -365,17 +367,17 @@ void PaintView::paintly()
 
 	int maxBrushSize = m_pDoc->m_pUI->getPaintlyMaxBrush();
 	int minBrushSize = m_pDoc->m_pUI->getPaintlyMinBrush();
-	double gridRate = m_pDoc->m_pUI->getPaintlyGrid();
+	double gridRatio = m_pDoc->m_pUI->getPaintlyGrid();
 	int threshold = m_pDoc->m_pUI->getPaintlyThreshold();
 	int layers = m_pDoc->m_pUI->getPaintlyLayers();
-	int brushSizeDecay = (maxBrushSize - minBrushSize) / layers;
+	int brushSizeStep = (maxBrushSize - minBrushSize) / layers;
 
-	brushSizeDecay = brushSizeDecay > 1 ? brushSizeDecay : 1;
+	brushSizeStep = brushSizeStep > 1 ? brushSizeStep : 1;
 
-	for (int i = maxBrushSize; i >= minBrushSize; i-=brushSizeDecay) {
+	for (int i = maxBrushSize; i >= minBrushSize; i-=brushSizeStep) {
 		paintlyBlur(m_pDoc->m_ucBitmap, reference, i);
 		paintlyDifferenceCalculate(canvas, reference, diff);
-		paintlyLayer(canvas, diff, reference, gridRate, i, threshold);
+		paintlyLayer(canvas, diff, reference, gridRatio, i, threshold);
 	}
 	// m_pDoc->m_pUI->m_paintView->refresh();//????
 	//glFlush();
@@ -418,13 +420,13 @@ void PaintView::paintlyDifferenceCalculate(unsigned char* canvas, unsigned char*
 			diff[pos] = (reference[pos * 3] - canvas[pos * 3]) * (reference[pos * 3] - canvas[pos * 3])
 				+ (reference[pos * 3 + 1] - canvas[pos * 3 + 1]) * (reference[pos * 3 + 1] - canvas[pos * 3 + 1])
 				+ (reference[pos * 3 + 2] - canvas[pos * 3 + 2]) * (reference[pos * 3 + 2] - canvas[pos * 3 + 2]);
-			diff[pos] = (unsigned char)sqrt((double)diff[pos]);
+			diff[pos] = (unsigned char)(sqrt((double)diff[pos])/3);
 			
 		}
 	}
 }
 
-void PaintView::makeCurved(const Point& start, unsigned char* reference, int brushSize, unsigned char* canvas, std::vector<Point>& vP, std::vector<int>& vR, std::vector<int>& vG, std::vector<int>& vB)
+void PaintView::makeCurved(const Point& start, unsigned char* reference, int brushSize, unsigned char* canvas, std::vector<Point>& vP)
 {
 	int startX = start.x;
 	int startY = start.y;
@@ -432,9 +434,6 @@ void PaintView::makeCurved(const Point& start, unsigned char* reference, int bru
 	unsigned char strokeColorG = reference[(startY*m_nDrawWidth + startX) * 3 + 1];
 	unsigned char strokeColorB = reference[(startY*m_nDrawWidth + startX) * 3 + 2];
 	vP.push_back(Point(startX, startY));
-	vR.push_back(strokeColorR);
-	vG.push_back(strokeColorG);
-	vB.push_back(strokeColorB);
 	int x = startX, y = startY;
 	int lastDx = 0, lastDy = 0;
 
@@ -451,8 +450,8 @@ void PaintView::makeCurved(const Point& start, unsigned char* reference, int bru
 			if (abs(diff1) < abs(diff2)) return;
 		}
 
-		int gradientX = (int)m_pDoc->m_nGradientxy[y * m_nDrawWidth + x];
-		int gradientY = (int)m_pDoc->m_nGradientxy[y * m_nDrawWidth + x + 1];
+		int gradientX = (int)m_pDoc->m_nGradientxy[2 * (y * m_pDoc->m_nWidth + x)];
+		int gradientY = (int)m_pDoc->m_nGradientxy[2 * (y * m_pDoc->m_nWidth + x) + 1];
 
 		int dx = -gradientY;
 		int dy = gradientX;
@@ -474,18 +473,15 @@ void PaintView::makeCurved(const Point& start, unsigned char* reference, int bru
 		lastDy = dy;
 		if (x < 0 || y < 0 || x > m_nDrawWidth-1 || y > m_nDrawHeight-1) return;
  		vP.push_back(Point(x, y));
-		vR.push_back(strokeColorR);
-		vG.push_back(strokeColorG);
-		vB.push_back(strokeColorB);
 	}
 }
 
-void PaintView::paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsigned char* reference, double gridRate, int brushSize, int threshold)
+void PaintView::paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsigned char* reference, double gridRatio, int brushSize, int threshold)
 {
 	int width = m_pDoc->m_nWidth;
 	int height = m_pDoc->m_nHeight;
 
-	int gridSize = (int)(gridRate * brushSize);
+	int gridSize = (int)(gridRatio * brushSize);
 	std::vector<Point> vec;
 	for (int i = 0; i < height; i += gridSize)
 	{
@@ -528,16 +524,13 @@ void PaintView::paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsign
 		if (m_pDoc->m_nPaintlyStrokeType == STROKE_CURVEDBRUSH)
 		{
 			std:: vector<Point> vp;
-			std:: vector<int> vr;
-			std:: vector<int> vg;
-			std:: vector<int> vb;
-			makeCurved(vec[i], reference, brushSize, canvas, vp, vr, vg, vb);
+			makeCurved(vec[i], reference, brushSize, canvas, vp);
 			for (int j = 0; j < vp.size(); j++) 
 			{
 				// CircleBrush* a = (CircleBrush*)m_pDoc->m_pCurrentBrush;
 				// a->DrawCircle(vp[0], vp[j], (((float)(brushSize*2))/3.0));
 				m_pDoc->setBrushType(BRUSH_CIRCLES);
-				m_pDoc->setSize(brushSize);
+				m_pDoc->setSize(1.5 * brushSize);
 				m_pDoc->m_pCurrentBrush->BrushBegin(vp[0], vp[j]);
 				m_pDoc->m_pCurrentBrush->BrushEnd(vp[0], vp[j]);
 			}

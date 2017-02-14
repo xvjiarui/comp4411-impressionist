@@ -703,31 +703,34 @@ void ImpressionistUI::cb_paintlyStyleChoice(Fl_Widget* o, void* v)
 		pUI->m_paintlyBlurSlider->deactivate();
 		pUI->m_paintlyAlphaSlider->deactivate();
 		pUI->m_paintlyLayersSlider->deactivate();
+		pUI->m_paintlyStrokeChoice->value(1);
+		pDoc->setPaintlyStrokeType(STROKE_CURVEDBRUSH);
 		if (type == STYLE_IMPRESSIONIST)
 		{	
-			pUI->m_paintlyStrokeChoice->value(1);
-			pUI->m_nPaintlyThreshold = 30;
+			
+			pUI->m_nPaintlyThreshold = 100;
 			pUI->m_nPaintlyMaxBrush = 8;
 			pUI->m_nPaintlyMinBrush = 2;
 			pUI->m_dPaintlyGrid = 1.0;
 			pUI->m_dPaintlyCurvature = 1.0;
 			pUI->m_dPaintlyBlur = 0.8;
-			pUI->m_nPaintlyMaxStroke = 8;
+			pUI->m_nPaintlyMaxStroke = 16;
 			pUI->m_nPaintlyMinStroke = 4;
-			pUI->m_dPaintlyAlpha = 0.85;
-			pUI->m_nPaintlyLayers = 2;
+			pUI->m_dOpacity = 1;
+			pUI->m_nPaintlyLayers = 3;
 		}
 		else if (type == STYLE_EXPRESSIONIST)
 		{
-			pUI->m_nPaintlyThreshold = 10;
-			pUI->m_nPaintlyMaxBrush = 7;
-			pUI->m_nPaintlyMinBrush = 3;
+			pUI->m_paintlyStrokeChoice->value(0);
+			pUI->m_nPaintlyThreshold = 50;
+			pUI->m_nPaintlyMaxBrush = 8;
+			pUI->m_nPaintlyMinBrush = 2;
 			pUI->m_dPaintlyGrid = 1.0;
-			pUI->m_dPaintlyCurvature = 0.45;
+			pUI->m_dPaintlyCurvature = 0.25;
 			pUI->m_dPaintlyBlur = 0.5;
-			pUI->m_nPaintlyMaxStroke = 20;
-			pUI->m_nPaintlyMinStroke = 12;
-			pUI->m_dPaintlyAlpha = 1.0;
+			pUI->m_nPaintlyMaxStroke = 16;
+			pUI->m_nPaintlyMinStroke = 10;
+			pUI->m_dOpacity = 0.7;
 			pUI->m_nPaintlyLayers = 3;
 		}
 	}
@@ -773,7 +776,10 @@ void ImpressionistUI::cb_paintly_apply_button(Fl_Widget* o, void* v)
 
 void ImpressionistUI::cb_paintlyThresholdSlider(Fl_Widget* o, void* v)
 {
-	((ImpressionistUI*)(o->user_data()))->m_nPaintlyThreshold=int( ((Fl_Slider *)o)->value() ) ;}
+	((ImpressionistUI*)(o->user_data()))->m_nPaintlyThreshold=int( ((Fl_Slider *)o)->value() ) ;
+	printf("%d\n", ((ImpressionistUI*)(o->user_data()))->m_nPaintlyThreshold );
+}
+
 
 void ImpressionistUI::cb_paintlyMaxBrushSizeSlider(Fl_Widget* o, void* v)
 {
@@ -1252,18 +1258,17 @@ ImpressionistUI::ImpressionistUI() {
 	m_bAnotherGradient = FALSE;
 	m_bSizeRandom = FALSE;
 	m_bNormalize = FALSE;
-
-	m_nPaintlyThreshold = 30;
+	m_nPaintlyThreshold = 100;
 	m_nPaintlyMaxBrush = 8;
 	m_nPaintlyMinBrush = 2;
-	m_nPaintlyMaxStroke = 8;
+	m_nPaintlyMaxStroke = 16;
 	m_nPaintlyMinStroke = 4;
-	m_nPaintlyLayers = 2;
+	m_nPaintlyLayers = 3;
 
 	m_dPaintlyGrid = 1.0;
 	m_dPaintlyCurvature = 1.0;
 	m_dPaintlyBlur = 0.8;
-	m_dPaintlyAlpha = 0.85;
+	m_dPaintlyAlpha = 1;
 	m_dPaintlyJr = 1.0;
 	m_dPaintlyJg = 1.0;
 	m_dPaintlyJb = 1.0;
@@ -1458,7 +1463,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyThresholdSlider->minimum(0);
 		m_paintlyThresholdSlider->maximum(250);
 		m_paintlyThresholdSlider->step(1);
-		m_paintlyThresholdSlider->value(100);
+		m_paintlyThresholdSlider->value(m_nPaintlyThreshold);
 		m_paintlyThresholdSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyThresholdSlider->callback(cb_paintlyThresholdSlider);
 		m_paintlyThresholdSlider->deactivate();
@@ -1471,7 +1476,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyMaxBrushSizeSlider->minimum(1);
 		m_paintlyMaxBrushSizeSlider->maximum(15);
 		m_paintlyMaxBrushSizeSlider->step(1);
-		m_paintlyMaxBrushSizeSlider->value(10);
+		m_paintlyMaxBrushSizeSlider->value(m_nPaintlyMaxBrush);
 		m_paintlyMaxBrushSizeSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyMaxBrushSizeSlider->callback(cb_paintlyMaxBrushSizeSlider);
 		m_paintlyMaxBrushSizeSlider->deactivate();
@@ -1484,7 +1489,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyMinBrushSizeSlider->minimum(1);
 		m_paintlyMinBrushSizeSlider->maximum(15);
 		m_paintlyMinBrushSizeSlider->step(1);
-		m_paintlyMinBrushSizeSlider->value(4);
+		m_paintlyMinBrushSizeSlider->value(m_nPaintlyMinBrush);
 		m_paintlyMinBrushSizeSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyMinBrushSizeSlider->callback(cb_paintlyMinBrushSizeSlider);
 		m_paintlyMinBrushSizeSlider->deactivate();
@@ -1497,7 +1502,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyGridSlider->minimum(0);
 		m_paintlyGridSlider->maximum(1);
 		m_paintlyGridSlider->step(0.01);
-		m_paintlyGridSlider->value(1);
+		m_paintlyGridSlider->value(m_dPaintlyGrid);
 		m_paintlyGridSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyGridSlider->callback(cb_paintlyGridSlider);
 		m_paintlyGridSlider->deactivate();
@@ -1510,7 +1515,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyCurvatureSlider->minimum(0);
 		m_paintlyCurvatureSlider->maximum(1);
 		m_paintlyCurvatureSlider->step(0.01);
-		m_paintlyCurvatureSlider->value(1);
+		m_paintlyCurvatureSlider->value(m_dPaintlyCurvature);
 		m_paintlyCurvatureSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyCurvatureSlider->callback(cb_paintlyCurvatureSlider);
 		m_paintlyCurvatureSlider->deactivate();
@@ -1523,7 +1528,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyBlurSlider->minimum(0);
 		m_paintlyBlurSlider->maximum(1);
 		m_paintlyBlurSlider->step(0.01);
-		m_paintlyBlurSlider->value(0.50);
+		m_paintlyBlurSlider->value(m_dPaintlyBlur);
 		m_paintlyBlurSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyBlurSlider->callback(cb_paintlyBlurSlider);
 		m_paintlyBlurSlider->deactivate();
@@ -1536,7 +1541,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyMaxStrokeLengthSlider->minimum(0);
 		m_paintlyMaxStrokeLengthSlider->maximum(30);
 		m_paintlyMaxStrokeLengthSlider->step(1);
-		m_paintlyMaxStrokeLengthSlider->value(16);
+		m_paintlyMaxStrokeLengthSlider->value(m_nPaintlyMaxStroke);
 		m_paintlyMaxStrokeLengthSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyMaxStrokeLengthSlider->callback(cb_paintlyMaxStrokeLengthSlider);
 		m_paintlyMaxStrokeLengthSlider->deactivate();
@@ -1549,7 +1554,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyMinStrokeLengthSlider->minimum(0);
 		m_paintlyMinStrokeLengthSlider->maximum(30);
 		m_paintlyMinStrokeLengthSlider->step(1);
-		m_paintlyMinStrokeLengthSlider->value(4);
+		m_paintlyMinStrokeLengthSlider->value(m_nPaintlyMinStroke);
 		m_paintlyMinStrokeLengthSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyMinStrokeLengthSlider->callback(cb_paintlyMinStrokeLengthSlider);
 		m_paintlyMinStrokeLengthSlider->deactivate();
@@ -1562,7 +1567,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyAlphaSlider->minimum(0);
 		m_paintlyAlphaSlider->maximum(1);
 		m_paintlyAlphaSlider->step(0.01);
-		m_paintlyAlphaSlider->value(1);
+		m_paintlyAlphaSlider->value(m_dOpacity);
 		m_paintlyAlphaSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyAlphaSlider->callback(cb_paintlyAlphaSlider);
 		m_paintlyAlphaSlider->deactivate();
@@ -1575,7 +1580,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyLayersSlider->minimum(1);
 		m_paintlyLayersSlider->maximum(5);
 		m_paintlyLayersSlider->step(1);
-		m_paintlyLayersSlider->value(3);
+		m_paintlyLayersSlider->value(m_nPaintlyLayers);
 		m_paintlyLayersSlider->align(FL_ALIGN_RIGHT);
 		m_paintlyLayersSlider->callback(cb_paintlyLayersSlider);
 		m_paintlyLayersSlider->deactivate();
@@ -1588,7 +1593,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyJrSlider->minimum(1);
 		m_paintlyJrSlider->maximum(0);
 		m_paintlyJrSlider->step(0.01);
-		m_paintlyJrSlider->value(1);
+		m_paintlyJrSlider->value(m_dPaintlyJr);
 		m_paintlyJrSlider->align(FL_ALIGN_BOTTOM);
 		m_paintlyJrSlider->callback(cb_paintlyJrSlider);
 
@@ -1600,7 +1605,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyJgSlider->minimum(1);
 		m_paintlyJgSlider->maximum(0);
 		m_paintlyJgSlider->step(0.01);
-		m_paintlyJgSlider->value(1);
+		m_paintlyJgSlider->value(m_dPaintlyJg);
 		m_paintlyJgSlider->align(FL_ALIGN_BOTTOM);
 		m_paintlyJgSlider->callback(cb_paintlyJgSlider);
 
@@ -1612,7 +1617,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyJbSlider->minimum(1);
 		m_paintlyJbSlider->maximum(0);
 		m_paintlyJbSlider->step(0.01);
-		m_paintlyJbSlider->value(1);
+		m_paintlyJbSlider->value(m_dPaintlyJb);
 		m_paintlyJbSlider->align(FL_ALIGN_BOTTOM);
 		m_paintlyJbSlider->callback(cb_paintlyJbSlider);
 
@@ -1624,7 +1629,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyJhSlider->minimum(1);
 		m_paintlyJhSlider->maximum(0);
 		m_paintlyJhSlider->step(0.01);
-		m_paintlyJhSlider->value(1);
+		m_paintlyJhSlider->value(m_dPaintlyJh);
 		m_paintlyJhSlider->align(FL_ALIGN_BOTTOM);
 		m_paintlyJhSlider->callback(cb_paintlyJhSlider);
 
@@ -1636,7 +1641,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyJsSlider->minimum(1);
 		m_paintlyJsSlider->maximum(0);
 		m_paintlyJsSlider->step(0.01);
-		m_paintlyJsSlider->value(1);
+		m_paintlyJsSlider->value(m_dPaintlyJs);
 		m_paintlyJsSlider->align(FL_ALIGN_BOTTOM);
 		m_paintlyJsSlider->callback(cb_paintlyJsSlider);
 
@@ -1648,7 +1653,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_paintlyJvSlider->minimum(1);
 		m_paintlyJvSlider->maximum(0);
 		m_paintlyJvSlider->step(0.01);
-		m_paintlyJvSlider->value(1);
+		m_paintlyJvSlider->value(m_dPaintlyJv);
 		m_paintlyJvSlider->align(FL_ALIGN_BOTTOM);
 		m_paintlyJvSlider->callback(cb_paintlyJvSlider);
 
