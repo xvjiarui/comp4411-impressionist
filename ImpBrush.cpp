@@ -44,8 +44,8 @@ char* ImpBrush::BrushName(void)
 void ImpBrush::SetColor (const Point source)
 {
 	ImpressionistDoc* pDoc = GetDocument();
-
-
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	GLubyte color[4];
 	memcpy ( color, pDoc->GetOriginalPixel( source ), 3 );
 	double r = pDoc->m_pUI->getR();
@@ -59,11 +59,11 @@ void ImpBrush::SetColor (const Point source)
 
 }
 
-void ImpBrush::SetColor (const Point source, int alpha)
+void ImpBrush::SetColor (const Point source, GLubyte alpha)
 {
 	ImpressionistDoc* pDoc = GetDocument();
-
-
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	GLubyte color[4];
 	memcpy ( color, pDoc->GetOriginalPixel( source ), 3 );
 	double r = pDoc->m_pUI->getR();

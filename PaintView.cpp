@@ -529,8 +529,10 @@ void PaintView::paintlyLayer(unsigned char* canvas, unsigned char* diff,  unsign
 			{
 				// CircleBrush* a = (CircleBrush*)m_pDoc->m_pCurrentBrush;
 				// a->DrawCircle(vp[0], vp[j], (((float)(brushSize*2))/3.0));
-				m_pDoc->setBrushType(BRUSH_CIRCLES);
-				m_pDoc->setSize(1.5 * brushSize);
+				// m_pDoc->setBrushType(BRUSH_CIRCLES);
+				// m_pDoc->setSize(1.5 * brushSize);
+				m_pDoc->setBrushType(BRUSH_POINTS);
+				m_pDoc->setSize(brushSize);
 				m_pDoc->m_pCurrentBrush->BrushBegin(vp[0], vp[j]);
 				m_pDoc->m_pCurrentBrush->BrushEnd(vp[0], vp[j]);
 			}

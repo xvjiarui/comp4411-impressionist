@@ -399,7 +399,7 @@ int ImpressionistDoc::dissolveImage(char *iname)
 	}
 	if (width != m_nWidth || height != m_nHeight)
 	{
-		fl_alert("Diffent size");
+		fl_alert("Different size");
 		return 0;
 	}
 
@@ -444,7 +444,7 @@ int ImpressionistDoc::loadEdgeImage(char *iname)
 
 	if (width != m_nWidth || height != m_nHeight)
 	{
-		fl_alert("Diffent size");
+		fl_alert("Different size");
 		return 0;
 	}
 
@@ -492,7 +492,7 @@ int ImpressionistDoc::loadAnotherImage(char *iname)
 
 	if (width != m_nWidth || height != m_nHeight)
 	{
-		fl_alert("Diffent size");
+		fl_alert("Different size");
 		return 0;
 	}
 
@@ -546,7 +546,7 @@ int ImpressionistDoc::loadMuralImage(char *iname)
 
 	if (width != m_nWidth || height != m_nHeight)
 	{
-		fl_alert("Diffent size");
+		fl_alert("Different size");
 		return 0;
 	}
 	// reflect the fact of loading the new image
@@ -588,16 +588,22 @@ int ImpressionistDoc::loadMuralImage(char *iname)
 // This is called by the UI when the load alpha brush button is 
 // pressed.
 //---------------------------------------------------------
-int ImpressionistDoc::loadAlphaBrush(char* iname)
+int ImpressionistDoc::loadAlphaMap(char* iname)
 {
 	// try to open the image to read
 	unsigned char*	data;
 	int				width,
 		height;
 
-	if ((data = readBMP(iname, width, height)) == NULL)
+	if ((data = readBWBMP(iname, width, height)) == NULL)
 	{
 		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (width != m_nWidth || height != m_nHeight)
+	{
+		fl_alert("Different size");
 		return 0;
 	}
 

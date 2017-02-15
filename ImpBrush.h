@@ -75,7 +75,7 @@ public:
 
 	// according to the source image and the position, determine the draw color
 	void SetColor( const Point source );
-	void SetColor( const Point source, int alpha);
+	void SetColor( const Point source, GLubyte alpha);
 
 	// get Doc to communicate with it
 	ImpressionistDoc* GetDocument( void );

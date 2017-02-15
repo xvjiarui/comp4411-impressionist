@@ -340,7 +340,7 @@ void ImpressionistUI::cb_load_alpha_brush(Fl_Menu_* o, void* v)
 
 	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
 	if (newfile != NULL) {
-		pDoc->loadAlphaBrush(newfile);
+		pDoc->loadAlphaMap(newfile);
 	}
 	brushTypeMenu[BRUSH_ALPHA_MAPPED].activate();
 }

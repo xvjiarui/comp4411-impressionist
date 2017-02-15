@@ -100,6 +100,91 @@ unsigned char* readBMP(char*	fname,
 			  
 	return data; 
 } 
+
+unsigned char* readBWBMP(char*	fname, 
+					   int&		width,
+					   int&		height)
+{ 
+	FILE* file; 
+	BMP_DWORD pos; 
+ 
+	if ( (file=fopen( fname, "rb" )) == NULL )  
+		return NULL; 
+	 
+//	I am doing fread( &bmfh, sizeof(BMP_BITMAPFILEHEADER), 1, file ) in a safe way. :}
+	fread( &(bmfh.bfType), 2, 1, file); 
+	fread( &(bmfh.bfSize), 4, 1, file); 
+	fread( &(bmfh.bfReserved1), 2, 1, file); 
+	fread( &(bmfh.bfReserved2), 2, 1, file); 
+	fread( &(bmfh.bfOffBits), 4, 1, file); 
+
+	pos = bmfh.bfOffBits; 
+ 
+	fread( &bmih, sizeof(BMP_BITMAPINFOHEADER), 1, file ); 
+ 
+	// error checking
+	if ( bmfh.bfType!= 0x4d42 ) {	// "BM" actually
+		return NULL;
+	}
+	if ( bmih.biBitCount != 8 )  
+		return NULL; 
+/*
+ 	if ( bmih.biCompression != BMP_BI_RGB ) {
+		return NULL;
+	}
+*/
+	fseek( file, pos, SEEK_SET ); 
+ 
+	width = bmih.biWidth; 
+	height = bmih.biHeight; 
+ 
+	int padWidth = width; 
+	int pad = 0; 
+	if ( padWidth % 4 != 0 ) 
+	{ 
+		pad = 4 - (padWidth % 4); 
+		padWidth += pad; 
+	} 
+	int bytes = height*padWidth; 
+ 
+	unsigned char *data = new unsigned char [bytes]; 
+
+	int result = fread( data, bytes, 1, file ); 
+	
+	if (!result) {
+		delete [] data;
+		return NULL;
+	}
+
+	fclose( file );
+	
+	// shuffle bitmap data such that it is (R,G,B) tuples in row-major order
+	int i, j;
+	j = 0;
+	unsigned char temp;
+	unsigned char* in;
+	unsigned char* out;
+
+	in = data;
+	out = data;
+
+	// for ( j = 0; j < height; ++j )
+	// {
+	// 	for ( i = 0; i < width; ++i )
+	// 	{
+	// 		out[1] = in[1];
+	// 		temp = in[2];
+	// 		out[2] = in[0];
+	// 		out[0] = temp;
+
+	// 		in += 1;
+	// 		out += 1;
+	// 	}
+	// 	in += pad;
+	// }
+			  
+	return data; 
+} 
  
 void writeBMP(char*				iname,
 			  int				width, 

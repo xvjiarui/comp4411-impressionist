@@ -26,7 +26,7 @@ public:
 	int		loadAnotherImage(char *iname);			// called by the UI to load another image
 	int 	loadEdgeImage(char *iname);
 	int 	loadMuralImage(char *iname);
-	int 	loadAlphaBrush(char *iname);
+	int 	loadAlphaMap(char *iname);
 	void 	generateRGB();
 
 

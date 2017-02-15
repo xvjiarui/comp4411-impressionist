@@ -11,7 +11,9 @@ ImpBrush(pDoc, name)
 
 void AlphaMappedBrush::BrushBegin(const Point source, const Point target)
 {
-	glPointSize(1);
+	glPointSize(2);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	BrushMove(source, target);
 }
 
@@ -24,23 +26,10 @@ void AlphaMappedBrush::BrushMove(const Point source, const Point target)
 		printf("PointBrush::BrushMove  document is NULL\n");
 		return;
 	}
-
 	glBegin(GL_POINTS);
-	int beginX = target.x - pDoc->m_nAlphaBrushWidth / 2;
-	int beginY = target.y - pDoc->m_nAlphaBrushHeight / 2;
-	for (int i = 0; i < pDoc->m_nAlphaBrushWidth; ++i)
-	{
-		for (int j = 0; j < pDoc->m_nAlphaBrushHeight; ++j)
-		{
-			
-			//get alpha value of the brush
-			int alpha = pDoc->m_ucAlphaBrushBitmap[3 * (j * pDoc->m_nAlphaBrushWidth + i)];
-			//set the color
-			SetColor(source, alpha);
-			//draw the point
-			glVertex2d(beginX + i, beginY + j);
-		}
-	}
+	GLubyte alpha = pDoc->m_ucAlphaBrushBitmap[ target.y * pDoc->m_nWidth + target.x];
+	SetColor(source, alpha);
+	glVertex2d(target.x, target.y);
 	glEnd();
 	glFlush();
 }

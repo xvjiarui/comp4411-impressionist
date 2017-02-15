@@ -41,6 +41,7 @@ typedef struct {
 
 // global I/O routines
 extern unsigned char* readBMP( char* fname, int& width, int& height );
+extern unsigned char* readBWBMP( char* fname, int& width, int& height );
 extern void writeBMP( char* iname, int width, int height, unsigned char* data ); 
 
 #endif
