@@ -53,7 +53,8 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nGradientValue = NULL;
 	m_nAnotherGradientxy = NULL;
 	m_nAnotherGradientValue = NULL;
-
+	firstTime = true;
+	lastDimmedValue = 0;
 	// create one instance of each brush
 	ImpBrush::c_nBrushCount	= NUM_BRUSH_TYPE;
 	ImpBrush::c_pBrushes	= new ImpBrush* [ImpBrush::c_nBrushCount];
@@ -962,19 +963,40 @@ void ImpressionistDoc:: applyUserFilter(){
 void ImpressionistDoc:: changeDimmedValue(){
 	double dimmedValue = m_pUI->getDimmedValue();
 	for (int i = 0; i < 3* m_nWidth * m_nHeight; ++i)
-	{
-		// m_ucPainting[i] = dimmedValue * m_ucBitmap[i] + (1 - dimmedValue) * m_ucDisplayBitmap[i];
-		m_ucDisplayBitmap[i] = dimmedValue * m_ucBitmap[i] + (1 - dimmedValue) * m_ucPainting[i];
+	{	
+		if (m_pUI->getDimmedChoice())
+		{	
+			int temp = m_ucPainting[i];
+			m_ucPainting[i] =  m_ucBitmap[i] * dimmedValue;
+		}
+		else
+		{
+			GLubyte temp = m_ucBitmap[i] * dimmedValue;
+			if (m_ucPainting[i] == temp )
+			{
+				m_ucPainting[i] = 0;
+			}
+		}
+		// m_ucDisplayBitmap[i] = m_ucBitmap[i] * dimmedValue + m_ucPainting[i] * (1 - dimmedValue);
+		// printf("display: %d\n", m_ucDisplayBitmap[i]);
+		// m_ucPainting[i] = dimmedValue * m_ucBitmap[i] + (1 - dimmedValue ) * m_ucPainting[i];
 	}
-	// display it on origView
-	m_pUI->m_origView->resizeWindow(m_nWidth, m_nHeight);	
-	m_pUI->m_origView->refresh();
+	printf("%d\n",m_ucPainting[0] );
+	for (int i = 0; i < 3 * m_nWidth * m_nHeight; ++i)
+	{
+		m_ucDisplayBitmap[i] = m_ucPainting[i];
+	}
+	// printf("display:%d\n", m_ucDisplayBitmap[0]);
+	// printf("paint:%d\n", m_ucPainting[0]);
 	// refresh paint view as well
 	// Dimme abort
-	// swap(m_ucPainting, m_ucDisplayBitmap);
+	// printf("dimmedValue: %f\n", dimmedValue);
 	m_pUI->m_paintView->resizeWindow(m_nWidth, m_nHeight);	
 	m_pUI->m_paintView->refresh();
-	// swap(m_ucPainting, m_ucDisplayBitmap);
+	
+	// m_ucPainting = temp;
+
+	
 }
 
 void ImpressionistDoc::swap(GLubyte* &a, GLubyte* &b)
@@ -992,7 +1014,6 @@ void ImpressionistDoc::setPaintingDone(){
 
 void ImpressionistDoc:: generateBlur()
 {
-	printf("blur\n");
 	double f_sigma = m_pUI->getPaintlyBlur();
 	int kernel_size = 50 * f_sigma;
 	int sigma = 7;

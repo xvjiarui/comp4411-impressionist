@@ -154,6 +154,8 @@ public:
 private:
 	char			m_imageName[256];
 	void 			setPaintingDone();
+	bool 			firstTime;
+	double 			lastDimmedValue;
 
 };
 

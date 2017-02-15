@@ -556,6 +556,22 @@ void ImpressionistUI::cb_dimmed_value_slide(Fl_Widget* o, void* v)
 	pDoc->changeDimmedValue();
 }
 
+void ImpressionistUI::cb_dimmed_lbutton(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI=((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+	if (pUI->m_bDimmed==TRUE)
+	{
+		pUI->m_bDimmed=FALSE;
+		pUI->m_DimmedViewButton->value(0);
+	} 
+	else {
+		pUI->m_bDimmed=TRUE;
+		pUI->m_DimmedViewButton->value(1);
+	}
+	pDoc->changeDimmedValue();
+}
+
 void ImpressionistUI::cb_edge_clipping_lbutton(Fl_Widget* o, void* v)
 {
 	ImpressionistUI* pUI=((ImpressionistUI*)(o->user_data()));
@@ -937,6 +953,11 @@ double ImpressionistUI::getDimmedValue()
 	return m_dDimmedValue;
 }
 
+bool ImpressionistUI::getDimmedChoice()
+{
+	return m_bDimmed;
+}
+
 //------------------------------------------------
 // Return the R
 //------------------------------------------------
@@ -1258,6 +1279,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_bAnotherGradient = FALSE;
 	m_bSizeRandom = FALSE;
 	m_bNormalize = FALSE;
+	m_bDimmed = FALSE;
 	m_nPaintlyThreshold = 100;
 	m_nPaintlyMaxBrush = 8;
 	m_nPaintlyMinBrush = 2;
@@ -1420,7 +1442,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_filterSizeDialog->end();
 
 
-	m_dimmedDialog = new Fl_Window(300,100, "Dimmed Value");
+	m_dimmedDialog = new Fl_Window(300,200, "Dimmed Value");
 
 		// / Add dimmed value slider to the dialog 
 		m_DimmedValueSlider = new Fl_Value_Slider(10, 20, 150, 20, "&Dimmed value");
@@ -1434,6 +1456,10 @@ ImpressionistUI::ImpressionistUI() {
 		m_DimmedValueSlider->value(m_dDimmedValue);
 		m_DimmedValueSlider->align(FL_ALIGN_RIGHT);
 		m_DimmedValueSlider->callback(cb_dimmed_value_slide);
+
+		m_DimmedViewButton = new Fl_Light_Button(10,50,150,20,"&Dimmed");
+		m_DimmedViewButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_DimmedViewButton->callback(cb_dimmed_lbutton);
 
 	m_dimmedDialog->end();
 	// m_dimmedDialog->callback(cb_restore_painting);

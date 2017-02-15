@@ -101,6 +101,7 @@ public:
 	Fl_Light_Button* 	m_EdgeClippingButton;
 	Fl_Light_Button*	m_AnotherGradientButton;
 	Fl_Light_Button*	m_SizeRandomButton;
+	Fl_Light_Button* 	m_DimmedViewButton;
 
 	std::vector<Fl_Float_Input*> m_FilterInputs;
 
@@ -124,6 +125,7 @@ public:
 	bool 				getNormalize();
 	double				getOpacity();
 	double 				getDimmedValue();
+	bool  				getDimmedChoice();
 	double				getR();
 	double				getG();
 	double				getB();
@@ -185,6 +187,7 @@ private:
 	bool	m_bAnotherGradient;
 	bool	m_bSizeRandom;
 	bool 	m_bNormalize;
+	bool 	m_bDimmed;
 	double m_dDimmedValue;
 	static double	m_nR;
 	static double	m_nG;
@@ -233,6 +236,7 @@ private:
 	static void cb_lineAngleSlides(Fl_Widget* o, void* v);
 	static void cb_opacitySlides(Fl_Widget* o, void* v);
 	static void cb_dimmed_value_slide(Fl_Widget* o, void* v);
+	static void cb_dimmed_lbutton(Fl_Widget* o, void* v);
 	static void cb_edge_clipping_lbutton(Fl_Widget* o, void* v);
 	static void cb_another_gradient_lbutton(Fl_Widget* o, void* v);
 	static void cb_size_random_lbutton(Fl_Widget* o, void* v);
