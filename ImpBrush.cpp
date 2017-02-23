@@ -73,5 +73,17 @@ void ImpBrush::SetColor (const Point source, GLubyte alpha)
 
 }
 
+void ImpBrush::SetGray (const Point source)
+{
+	ImpressionistDoc* pDoc = GetDocument();
+	GLubyte color[4];
+	memcpy ( color, pDoc->GetOriginalPixel( source ), 3 );
+	GLubyte gray = pDoc->grayPixel(color);
+	color[0] = gray;
+	color[1] = gray;
+	color[2] = gray;
+	color[3] = 255 * pDoc->getOpacity();
+	glColor4ubv( color );
+}
 
 

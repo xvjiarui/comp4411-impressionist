@@ -441,13 +441,13 @@ void PaintView::makeCurved(const Point& start, unsigned char* reference, int bru
 	{
 		if (i > m_pDoc->m_pUI->getPaintlyMinStroke())
 		{
-			int diff1 = reference[(y*m_nDrawWidth + x) * 3] - canvas[(y*m_nDrawWidth + x) * 3]
+			int difference1 = reference[(y*m_nDrawWidth + x) * 3] - canvas[(y*m_nDrawWidth + x) * 3]
 				+ reference[(y*m_nDrawWidth + x) * 3 + 1] - canvas[(y*m_nDrawWidth + x) * 3 + 1]
 				+ reference[(y*m_nDrawWidth + x) * 3 + 2] - canvas[(y*m_nDrawWidth + x) * 3 + 2];
-			int diff2 = reference[(y*m_nDrawWidth + x) * 3] - strokeColorR
+			int difference2 = reference[(y*m_nDrawWidth + x) * 3] - strokeColorR
 				+ reference[(y*m_nDrawWidth + x) * 3 + 1] - strokeColorG
 				+ reference[(y*m_nDrawWidth + x) * 3 + 2] - strokeColorB;
-			if (abs(diff1) < abs(diff2)) return;
+			if (abs(difference1) < abs(difference2)) return;
 		}
 
 		int gradientX = (int)m_pDoc->m_nGradientxy[2 * (y * m_pDoc->m_nWidth + x)];

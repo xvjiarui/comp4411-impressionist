@@ -143,6 +143,7 @@
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="BlurBrush.cpp" />
     <ClCompile Include="CircleBrush.cpp" />
+    <ClCompile Include="GrayBrush.cpp" />
     <ClCompile Include="ImpBrush.cpp" />
     <ClCompile Include="Impressionist.cpp" />
     <ClCompile Include="ImpressionistDoc.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="BlurBrush.h" />
     <ClInclude Include="CircleBrush.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="GrayBrush.h" />
     <ClInclude Include="ImpBrush.h" />
     <ClInclude Include="impressionist.h" />
     <ClInclude Include="impressionistDoc.h" />

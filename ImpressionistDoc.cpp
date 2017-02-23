@@ -24,6 +24,7 @@
 #include "SharpenBrush.h"
 #include "AlphaMappedBrush.h"
 #include "WarpBrush.h"
+#include "GrayBrush.h"
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -80,6 +81,8 @@ ImpressionistDoc::ImpressionistDoc()
 		= new AlphaMappedBrush( this, "Alpha Mapped" );
 	ImpBrush::c_pBrushes[BRUSH_WARP]				
 		= new WarpBrush( this, "Warp" );
+	ImpBrush::c_pBrushes[BRUSH_GRAY]				
+		= new GrayBrush( this, "Gray" );		
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];

@@ -1207,6 +1207,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Sharpen",			FL_ALT+'s', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SHARPEN},
   {"Warp",			FL_ALT+'w', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_WARP},
   { "Alpha Mapped", 	FL_ALT+'a', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_ALPHA_MAPPED, FL_MENU_INACTIVE},
+  {"Gray",			FL_ALT+'g', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_GRAY},
   {0}
 };
 
