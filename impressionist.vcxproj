@@ -144,6 +144,7 @@
     <ClCompile Include="BlurBrush.cpp" />
     <ClCompile Include="CircleBrush.cpp" />
     <ClCompile Include="GrayBrush.cpp" />
+    <ClCompile Include="HeartBrush.cpp" />
     <ClCompile Include="ImpBrush.cpp" />
     <ClCompile Include="Impressionist.cpp" />
     <ClCompile Include="ImpressionistDoc.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="ScatteredLineBrush.cpp" />
     <ClCompile Include="ScatteredPointBrush.cpp" />
     <ClCompile Include="SharpenBrush.cpp" />
+    <ClCompile Include="Trianglebrush.cpp" />
     <ClCompile Include="WarpBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +167,7 @@
     <ClInclude Include="CircleBrush.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="GrayBrush.h" />
+    <ClInclude Include="HeartBrush.h" />
     <ClInclude Include="ImpBrush.h" />
     <ClInclude Include="impressionist.h" />
     <ClInclude Include="impressionistDoc.h" />
@@ -177,6 +180,7 @@
     <ClInclude Include="ScatteredLineBrush.h" />
     <ClInclude Include="ScatteredPointBrush.h" />
     <ClInclude Include="SharpenBrush.h" />
+    <ClInclude Include="TriangleBrush.h" />
     <ClInclude Include="WarpBrush.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

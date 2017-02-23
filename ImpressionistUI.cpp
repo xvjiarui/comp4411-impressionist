@@ -1203,11 +1203,13 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Points",	FL_ALT+'q', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_POINTS},
   {"Scattered Lines",	FL_ALT+'m', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_LINES},
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
+  {"Triangles",			FL_ALT+'t', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_TRIANGLES},
+  {"Hearts",			FL_ALT+'h', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_HEARTS},
   {"Blur",				FL_ALT+'b', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_BLUR},
   {"Sharpen",			FL_ALT+'s', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SHARPEN},
-  {"Warp",			FL_ALT+'w', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_WARP},
+  {"Warp",				FL_ALT+'w', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_WARP},
   { "Alpha Mapped", 	FL_ALT+'a', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_ALPHA_MAPPED, FL_MENU_INACTIVE},
-  {"Gray",			FL_ALT+'g', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_GRAY},
+  {"Gray",				FL_ALT+'g', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_GRAY},
   {0}
 };
 
